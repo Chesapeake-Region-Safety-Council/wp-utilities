@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace CRSC\Util;
+namespace CRSC\WPUtilities;
 
 /**
  * Trait WCSettingsHelper
@@ -26,6 +26,11 @@ trait WCSettingsHelper {
 		return WCSettings::get_store_address_street();
 	}
 
+	/**
+	 * Retrieves the first line of the street address for the store from the WooCommerce settings.
+	 *
+	 * @return string The first line of the store's street address.
+	 */
 	public function get_store_street_address_street1(): string {
 		return WCSettings::get_store_street_address_street1();
 	}
