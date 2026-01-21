@@ -1,0 +1,20 @@
+{
+  "name": "crsc/wp-utilities",
+  "description": "A collection of WordPress and WooCommerce utility classes and traits used across CRSC plugins.",
+  "type": "library",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "Chesapeake Region Safety Council",
+      "homepage": "https://www.chesapeakesc.org"
+    }
+  ],
+  "require": {
+    "php": ">=8.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "CRSC\\WPUtilities\\": "src/"
+    }
+  }
+}
