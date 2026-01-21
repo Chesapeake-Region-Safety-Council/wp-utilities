@@ -67,7 +67,10 @@ trait Share {
 	 * Proxy to Utilities::get_plugin_file_uri_and_version()
 	 */
 	public function get_plugin_file_uri_and_version( string $file = '' ): array {
-		return $this->utilities ? $this->utilities->get_plugin_file_uri_and_version( $file ) : array( 'url' => '', 'version' => time() );
+		return $this->utilities ? $this->utilities->get_plugin_file_uri_and_version( $file ) : array(
+			'url'     => '',
+			'version' => time(),
+		);
 	}
 
 	/**

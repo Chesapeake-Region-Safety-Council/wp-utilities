@@ -63,8 +63,8 @@ class Utilities {
 
 		try {
 			if ( ! empty( $wp_filesystem ) &&
-			     is_callable( array( $wp_filesystem, 'wp_plugins_dir' ) ) &&
-			     ! empty( $wp_filesystem->wp_plugins_dir() ) ) {
+				is_callable( array( $wp_filesystem, 'wp_plugins_dir' ) ) &&
+				! empty( $wp_filesystem->wp_plugins_dir() ) ) {
 				$plugin_directory = $wp_filesystem->wp_plugins_dir();
 			}
 		} catch ( \TypeError $error ) {
@@ -154,11 +154,31 @@ class Utilities {
 		}
 
 		if ( ( defined( '\KINSTA_DEV_ENV' ) && true === \KINSTA_DEV_ENV ) ||
-		     'production' !== wp_get_environment_type() ||
-		     ( function_exists( '\wp_get_development_mode' ) && ! empty( wp_get_development_mode() ) ) ) {
+			'production' !== wp_get_environment_type() ||
+			( function_exists( '\wp_get_development_mode' ) && ! empty( wp_get_development_mode() ) ) ) {
 			return true;
 		}
 
+		return false;
+	}
+
+	/**
+	 * Determines if the current host matches common localhost patterns.
+	 *
+	 * Checks the hostname against a predefined list of typical localhost
+	 * identifiers, such as 'localhost', '127.0.0.1', and specific development
+	 * environment domains.
+	 *
+	 * @return bool Returns true if the current host matches a localhost pattern, otherwise false.
+	 */
+	public static function is_localhost(): bool {
+		$tlds         = array( 'localhost', '127.0.0.1', 'ddev.site', 'lando.site' );
+		$current_host = parse_url( home_url(), PHP_URL_HOST ) ?: ( $_SERVER['HTTP_HOST'] ?? '' );
+		foreach ( $tlds as $tld ) {
+			if ( str_contains( $current_host, $tld ) ) {
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -272,6 +292,44 @@ class Utilities {
 		global $wp_filesystem;
 		if ( ! empty( $wp_filesystem ) && is_callable( array( $wp_filesystem, 'exists' ) ) ) {
 			return $wp_filesystem->exists( $file_path );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Determine if WordPress debug mode is effectively enabled.
+	 *
+	 * Debug mode is considered ON if ANY of the following are true:
+	 * - WP_DEBUG is true
+	 * - SCRIPT_DEBUG is true
+	 * - WP_ENVIRONMENT_TYPE is not 'production'
+	 * - wp_get_environment_type() exists and is not 'production'
+	 * - WP_DEBUG_DISPLAY is true
+	 * - WP_DEBUG_LOG is true
+	 *
+	 * @return bool
+	 */
+	function is_wp_debug_mode_enabled(): bool {
+
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			return true;
+		}
+
+		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+			return true;
+		}
+
+		if ( function_exists( '\wp_get_environment_type' ) ) {
+			if ( 'production' !== wp_get_environment_type() ) {
+				return true;
+			}
+		}
+
+		if ( defined( 'WP_ENVIRONMENT_TYPE' ) ) {
+			if ( 'production' !== WP_ENVIRONMENT_TYPE ) {
+				return true;
+			}
 		}
 
 		return false;
@@ -446,7 +504,12 @@ class Utilities {
 	 * @return int|false Returns the integer value if it is within the range, or false if it is not.
 	 */
 	public static function within_200_range( mixed $value ): int|false {
-		$options = array( 'options' => array( 'min_range' => 200, 'max_range' => 299 ) );
+		$options = array(
+			'options' => array(
+				'min_range' => 200,
+				'max_range' => 299,
+			),
+		);
 		return filter_var( $value, FILTER_VALIDATE_INT, $options );
 	}
 
@@ -459,7 +522,12 @@ class Utilities {
 	 * @return int|false Returns the validated integer if within range, or false otherwise.
 	 */
 	public static function within_300_range( mixed $value ): int|false {
-		$options = array( 'options' => array( 'min_range' => 300, 'max_range' => 399 ) );
+		$options = array(
+			'options' => array(
+				'min_range' => 300,
+				'max_range' => 399,
+			),
+		);
 		return filter_var( $value, FILTER_VALIDATE_INT, $options );
 	}
 
@@ -472,28 +540,13 @@ class Utilities {
 	 * @return int|false Returns the validated integer if within the range, or false if it is not.
 	 */
 	public static function within_400_range( mixed $value ): int|false {
-		$options = array( 'options' => array( 'min_range' => 400, 'max_range' => 499 ) );
+		$options = array(
+			'options' => array(
+				'min_range' => 400,
+				'max_range' => 499,
+			),
+		);
 		return filter_var( $value, FILTER_VALIDATE_INT, $options );
-	}
-
-	/**
-	 * Determines if the current host matches common localhost patterns.
-	 *
-	 * Checks the hostname against a predefined list of typical localhost
-	 * identifiers, such as 'localhost', '127.0.0.1', and specific development
-	 * environment domains.
-	 *
-	 * @return bool Returns true if the current host matches a localhost pattern, otherwise false.
-	 */
-	public static function is_localhost(): bool {
-		$tlds = [ 'localhost', '127.0.0.1', 'ddev.site', 'lando.site' ];
-		$current_host = parse_url( home_url(), PHP_URL_HOST ) ?: ($_SERVER['HTTP_HOST'] ?? '');
-		foreach ( $tlds as $tld ) {
-			if ( str_contains( $current_host, $tld ) ) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
@@ -511,7 +564,7 @@ class Utilities {
 			$parts        = explode( '.', $clean );
 			$integer_part = $parts[0];
 			$decimal_part = str_pad( substr( $parts[1] ?? '', 0, 2 ), 2, '0' );
-			$clean = $integer_part . '.' . $decimal_part;
+			$clean        = $integer_part . '.' . $decimal_part;
 		}
 		return $clean;
 	}
@@ -530,8 +583,9 @@ class Utilities {
 		$found_matches = array();
 		foreach ( $search_array as $key => $value ) {
 			$string_value = is_string( $value ) ? $value : (string) $value;
-			$found = $case_sensitive ? str_contains( $string_value, $search_string ) : stripos( $string_value, $search_string ) !== false;
-			if ( $found ) { $found_matches[] = $return_keys ? $key : $value; }
+			$found        = $case_sensitive ? str_contains( $string_value, $search_string ) : stripos( $string_value, $search_string ) !== false;
+			if ( $found ) {
+				$found_matches[] = $return_keys ? $key : $value; }
 		}
 		return $found_matches;
 	}
@@ -549,17 +603,6 @@ class Utilities {
 	}
 
 	/**
-	 * Checks whether the debug mode is enabled based on the provided settings.
-	 *
-	 * @param array $settings An optional associative array of settings. The 'debug' key is used to determine the debug mode state. Defaults to an empty array.
-	 *
-	 * @return bool Returns true if the 'debug' key in the settings has a value of 'yes', otherwise returns false.
-	 */
-	public static function is_debug_enabled( array $settings = array() ): bool {
-		return 'yes' === ( $settings['debug'] ?? 'no' );
-	}
-
-	/**
 	 * Determines the current site based on the home URL.
 	 *
 	 * This method analyzes the site's home URL to identify and return
@@ -570,8 +613,10 @@ class Utilities {
 	 */
 	public static function which_site(): string {
 		$home_url = home_url( '/' );
-		if ( str_contains( $home_url, 'oshamidatlantic' ) ) { return 'oshamidatlantic'; }
-		if ( str_contains( $home_url, 'crscsafetyconference' ) ) { return 'crscsafetyconference'; }
+		if ( str_contains( $home_url, 'oshamidatlantic' ) ) {
+			return 'oshamidatlantic'; }
+		if ( str_contains( $home_url, 'crscsafetyconference' ) ) {
+			return 'crscsafetyconference'; }
 		return 'chesapeake';
 	}
 
@@ -580,14 +625,16 @@ class Utilities {
 	 *
 	 * @return bool Returns true if the site identifier contains 'oshamidatlantic', otherwise false.
 	 */
-	public static function is_oshamidatlantic(): bool { return str_contains( self::which_site(), 'oshamidatlantic' ); }
+	public static function is_oshamidatlantic(): bool {
+		return str_contains( self::which_site(), 'oshamidatlantic' ); }
 
 	/**
 	 * Determines if the current site is associated with Chesapeake.
 	 *
 	 * @return bool Returns true if the site identifier contains 'chesapeake', otherwise false.
 	 */
-	public static function is_chesapeake(): bool { return str_contains( self::which_site(), 'chesapeake' ); }
+	public static function is_chesapeake(): bool {
+		return str_contains( self::which_site(), 'chesapeake' ); }
 
 	/**
 	 * Determines if the current site is related to a safety conference.
@@ -596,14 +643,16 @@ class Utilities {
 	 *
 	 * @return bool Returns true if the site is identified as a safety conference, false otherwise.
 	 */
-	public static function is_safety_conference(): bool { return str_contains( self::which_site(), 'crscsafetyconference' ); }
+	public static function is_safety_conference(): bool {
+		return str_contains( self::which_site(), 'crscsafetyconference' ); }
 
 	/**
 	 * Retrieves the name of the site as defined in the WordPress settings.
 	 *
 	 * @return string The name of the site.
 	 */
-	public static function get_site_name(): string { return get_bloginfo( 'name' ); }
+	public static function get_site_name(): string {
+		return get_bloginfo( 'name' ); }
 
 	/**
 	 * Retrieves the inner HTML of the specified DOM element as a string.
@@ -631,7 +680,8 @@ class Utilities {
 	public static function set_inner_html( \DOMElement $element, string $html ): void {
 		$fragment = $element->ownerDocument->createDocumentFragment();
 		$fragment->appendXML( $html );
-		while ( $element->hasChildNodes() ) { $element->removeChild( $element->firstChild ); }
+		while ( $element->hasChildNodes() ) {
+			$element->removeChild( $element->firstChild ); }
 		$element->appendChild( $fragment );
 	}
 
@@ -641,8 +691,10 @@ class Utilities {
 	 * @return string The client's IP address. Returns values from HTTP_CLIENT_IP, HTTP_X_FORWARDED_FOR, or REMOTE_ADDR, depending on availability.
 	 */
 	public static function get_request_ip_address(): string {
-		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) { return $_SERVER['HTTP_CLIENT_IP']; }
-		if ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) { return $_SERVER['HTTP_X_FORWARDED_FOR']; }
+		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+			return $_SERVER['HTTP_CLIENT_IP']; }
+		if ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+			return $_SERVER['HTTP_X_FORWARDED_FOR']; }
 		return $_SERVER['REMOTE_ADDR'] ?? '';
 	}
 
@@ -657,23 +709,28 @@ class Utilities {
 	 */
 	public static function get_request_geolocation(): string {
 		$ip_address = self::get_request_ip_address();
-		$city = $region = $country = $country_code = $postal_code = '';
+		$city       = $region = $country = $country_code = $postal_code = '';
 
-		if ( isset( $_SERVER['GEOIP_COUNTRY_NAME'] ) ) { $country = sanitize_text_field( $_SERVER['GEOIP_COUNTRY_NAME'] ); }
-		if ( isset( $_SERVER['GEOIP_COUNTRY_CODE'] ) ) { $country_code = sanitize_text_field( $_SERVER['GEOIP_COUNTRY_CODE'] ); }
-		if ( isset( $_SERVER['GEOIP_REGION'] ) ) { $region = sanitize_text_field( $_SERVER['GEOIP_REGION'] ); }
-		if ( isset( $_SERVER['GEOIP_CITY'] ) ) { $city = sanitize_text_field( $_SERVER['GEOIP_CITY'] ); }
-		if ( isset( $_SERVER['GEOIP_POSTAL_CODE'] ) ) { $postal_code = sanitize_text_field( $_SERVER['GEOIP_POSTAL_CODE'] ); }
+		if ( isset( $_SERVER['GEOIP_COUNTRY_NAME'] ) ) {
+			$country = sanitize_text_field( $_SERVER['GEOIP_COUNTRY_NAME'] ); }
+		if ( isset( $_SERVER['GEOIP_COUNTRY_CODE'] ) ) {
+			$country_code = sanitize_text_field( $_SERVER['GEOIP_COUNTRY_CODE'] ); }
+		if ( isset( $_SERVER['GEOIP_REGION'] ) ) {
+			$region = sanitize_text_field( $_SERVER['GEOIP_REGION'] ); }
+		if ( isset( $_SERVER['GEOIP_CITY'] ) ) {
+			$city = sanitize_text_field( $_SERVER['GEOIP_CITY'] ); }
+		if ( isset( $_SERVER['GEOIP_POSTAL_CODE'] ) ) {
+			$postal_code = sanitize_text_field( $_SERVER['GEOIP_POSTAL_CODE'] ); }
 
 		if ( ! empty( $ip_address ) && empty( $country ) ) {
-			$url = sprintf( 'https://ipapi.co/%s/json', $ip_address );
+			$url      = sprintf( 'https://ipapi.co/%s/json', $ip_address );
 			$response = wp_remote_get( $url );
 			if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
 				$data = json_decode( wp_remote_retrieve_body( $response ), true );
 				if ( is_array( $data ) ) {
-					$country = sanitize_text_field( $data['country_name'] ?? '' );
-					$region = sanitize_text_field( $data['region'] ?? '' );
-					$city = sanitize_text_field( $data['city'] ?? '' );
+					$country     = sanitize_text_field( $data['country_name'] ?? '' );
+					$region      = sanitize_text_field( $data['region'] ?? '' );
+					$city        = sanitize_text_field( $data['city'] ?? '' );
 					$postal_code = sanitize_text_field( $data['postal'] ?? '' );
 				}
 			}
@@ -681,7 +738,8 @@ class Utilities {
 
 		if ( ! empty( $country ) ) {
 			$location = sprintf( '%s, %s, %s', $city, $region, $country );
-			if ( ! empty( $postal_code ) ) { $location .= ', ' . $postal_code; }
+			if ( ! empty( $postal_code ) ) {
+				$location .= ', ' . $postal_code; }
 			return $location;
 		}
 		return '';
@@ -700,7 +758,8 @@ class Utilities {
 	 */
 	public function get_text_domain(): string {
 		$main_file = $this->get_main_plugin_file();
-		if ( ! $main_file ) { return 'crsc-wp-utilities'; }
+		if ( ! $main_file ) {
+			return 'crsc-wp-utilities'; }
 		$data = get_plugin_data( $main_file, false );
 		return $data['TextDomain'] ?? 'crsc-wp-utilities';
 	}
@@ -712,7 +771,8 @@ class Utilities {
 	 */
 	public function get_plugin_slug(): string {
 		$main_file = $this->get_main_plugin_file();
-		if ( ! $main_file ) { return 'crsc-wp-utilities'; }
+		if ( ! $main_file ) {
+			return 'crsc-wp-utilities'; }
 		return basename( dirname( $main_file ) );
 	}
 
@@ -723,7 +783,8 @@ class Utilities {
 	 */
 	public function get_version(): string {
 		$main_file = $this->get_main_plugin_file();
-		if ( ! $main_file ) { return '1.0.0'; }
+		if ( ! $main_file ) {
+			return '1.0.0'; }
 		$data = get_plugin_data( $main_file, false );
 		return $data['Version'] ?? '1.0.0';
 	}
@@ -755,9 +816,11 @@ class Utilities {
 	 */
 	public function get_plugin_file_uri( string $file = '' ): ?string {
 		$main_file = $this->get_main_plugin_file();
-		if ( ! $main_file ) { return null; }
+		if ( ! $main_file ) {
+			return null; }
 		$file = ltrim( $file, '/' );
-		if ( empty( $file ) ) { return plugin_dir_url( $main_file ); }
+		if ( empty( $file ) ) {
+			return plugin_dir_url( $main_file ); }
 		if ( file_exists( plugin_dir_path( $main_file ) . $file ) ) {
 			return plugin_dir_url( $main_file ) . $file;
 		}
@@ -777,16 +840,20 @@ class Utilities {
 	 */
 	public function get_plugin_file_uri_and_version( string $file = '' ): array {
 		$main_file = $this->get_main_plugin_file();
-		if ( ! $main_file ) { return array( 'url' => '', 'version' => time() ); }
+		if ( ! $main_file ) {
+			return array(
+				'url'     => '',
+				'version' => time(),
+			); }
 		$plugin_dir = plugin_dir_path( $main_file );
 		$file_path  = $plugin_dir . $file;
 
 		$should_use_minified = ! ( defined( 'WP_DEBUG' ) && WP_DEBUG ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) && 'production' === wp_get_environment_type();
 		if ( $should_use_minified && ! str_contains( $file, '.min.' ) && preg_match( '/\.(js|css)$/', $file, $matches ) ) {
 			$extension = $matches[1];
-			$min_file = preg_replace( '/\.' . $extension . '$/', '.min.' . $extension, $file );
+			$min_file  = preg_replace( '/\.' . $extension . '$/', '.min.' . $extension, $file );
 			if ( file_exists( $plugin_dir . $min_file ) ) {
-				$file = $min_file;
+				$file      = $min_file;
 				$file_path = $plugin_dir . $file;
 			}
 		}
