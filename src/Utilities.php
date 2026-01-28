@@ -550,6 +550,25 @@ class Utilities {
 	}
 
 	/**
+	 * Validates if the given value is an integer within the range of 500 to 999. Useful for external API HTTP status
+	 * codes that could return a 500, 502, 503, 504, 505, or any status code that indicates something is broken or
+	 * not working properly.
+	 *
+	 * @param mixed $value The value to be validated.
+	 *
+	 * @return int|false Returns the validated integer if it falls within the range, or false otherwise.
+	 */
+	public static function within_500_range( mixed $value ): int|false {
+		$options = array(
+			'options' => array(
+				'min_range' => 500,
+				'max_range' => 999,
+			),
+		);
+		return filter_var( $value, FILTER_VALIDATE_INT, $options );
+	}
+
+	/**
 	 * Sanitizes a string representing a monetary value by removing any non-numeric and non-decimal characters.
 	 * Ensures the result has a maximum of two decimal places.
 	 *
