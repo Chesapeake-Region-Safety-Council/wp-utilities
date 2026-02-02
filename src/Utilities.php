@@ -310,13 +310,13 @@ class Utilities {
 	 *
 	 * @return bool
 	 */
-	function is_wp_debug_mode_enabled(): bool {
+	public static function is_wp_debug_mode_enabled(): bool {
 
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+		if ( defined( '\WP_DEBUG' ) && \WP_DEBUG ) {
 			return true;
 		}
 
-		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+		if ( defined( '\SCRIPT_DEBUG' ) && \SCRIPT_DEBUG ) {
 			return true;
 		}
 
@@ -326,10 +326,26 @@ class Utilities {
 			}
 		}
 
-		if ( defined( 'WP_ENVIRONMENT_TYPE' ) ) {
-			if ( 'production' !== WP_ENVIRONMENT_TYPE ) {
+		if ( defined( '\WP_ENVIRONMENT_TYPE' ) ) {
+			if ( 'production' !== \WP_ENVIRONMENT_TYPE ) {
 				return true;
 			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Determines whether WP_DEBUG_LOG is enabled.
+	 *
+	 * Checks if WP_DEBUG is active, the WP_DEBUG_LOG constant is defined,
+	 * and its value evaluates to true.
+	 *
+	 * @return bool True if WP_DEBUG_LOG is enabled, false otherwise.
+	 */
+	public static function is_wp_debug_log_enabled(): bool {
+		if ( self::is_wp_debug_mode_enabled() && defined( '\WP_DEBUG_LOG' ) && \WP_DEBUG_LOG ) {
+			return true;
 		}
 
 		return false;
