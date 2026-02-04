@@ -188,7 +188,8 @@ class Utilities {
 	 * @return bool True if the environment is WP-CLI, false otherwise.
 	 */
 	public static function is_wp_cli_environment(): bool {
-		if ( defined( '\WP_CLI' ) && \WP_CLI ) {
+		if ( defined( '\WP_CLI' ) && \WP_CLI && ( 'cli' === php_sapi_name() ||
+			'cli-server' === php_sapi_name() ) ) {
 			return true;
 		}
 
