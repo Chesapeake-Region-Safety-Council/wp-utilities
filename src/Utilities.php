@@ -745,10 +745,14 @@ class Utilities {
 	 */
 	public static function get_request_ip_address(): string {
 		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-			return $_SERVER['HTTP_CLIENT_IP']; }
+			return (string) $_SERVER['HTTP_CLIENT_IP'];
+		}
+
 		if ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-			return $_SERVER['HTTP_X_FORWARDED_FOR']; }
-		return $_SERVER['REMOTE_ADDR'] ?? '';
+			return (string) $_SERVER['HTTP_X_FORWARDED_FOR'];
+		}
+
+		return (string) ( $_SERVER['REMOTE_ADDR'] ?? '' );
 	}
 
 	/**
@@ -757,23 +761,27 @@ class Utilities {
 	 * This method uses server-provided GEOIP variables if available and falls back to a remote API call for
 	 * additional geolocation details based on the request's IP address.
 	 *
-	 * @return string A formatted string representing the location in the format "City, Region, Country, Postal Code",
-	 *                or an empty string if the location could not be determined.
+	 * @return array{city: string, region: string, country: string, postal_code: string} An associative array containing the city, region, country, and postal code.
 	 */
-	public static function get_request_geolocation(): string {
-		$ip_address = self::get_request_ip_address();
-		$city       = $region = $country = $country_code = $postal_code = '';
+	public static function get_request_geolocation(): array {
+		$ip_address  = self::get_request_ip_address();
+		$city        = '';
+		$region      = '';
+		$country     = '';
+		$postal_code = '';
 
 		if ( isset( $_SERVER['GEOIP_COUNTRY_NAME'] ) ) {
-			$country = sanitize_text_field( $_SERVER['GEOIP_COUNTRY_NAME'] ); }
-		if ( isset( $_SERVER['GEOIP_COUNTRY_CODE'] ) ) {
-			$country_code = sanitize_text_field( $_SERVER['GEOIP_COUNTRY_CODE'] ); }
+			$country = sanitize_text_field( $_SERVER['GEOIP_COUNTRY_NAME'] );
+		}
 		if ( isset( $_SERVER['GEOIP_REGION'] ) ) {
-			$region = sanitize_text_field( $_SERVER['GEOIP_REGION'] ); }
+			$region = sanitize_text_field( $_SERVER['GEOIP_REGION'] );
+		}
 		if ( isset( $_SERVER['GEOIP_CITY'] ) ) {
-			$city = sanitize_text_field( $_SERVER['GEOIP_CITY'] ); }
+			$city = sanitize_text_field( $_SERVER['GEOIP_CITY'] );
+		}
 		if ( isset( $_SERVER['GEOIP_POSTAL_CODE'] ) ) {
-			$postal_code = sanitize_text_field( $_SERVER['GEOIP_POSTAL_CODE'] ); }
+			$postal_code = sanitize_text_field( $_SERVER['GEOIP_POSTAL_CODE'] );
+		}
 
 		if ( ! empty( $ip_address ) && empty( $country ) ) {
 			$url      = sprintf( 'https://ipapi.co/%s/json', $ip_address );
@@ -787,15 +795,131 @@ class Utilities {
 					$postal_code = sanitize_text_field( $data['postal'] ?? '' );
 				}
 			}
+
+			if ( empty( $country ) ) {
+				$url      = sprintf( 'https://get.geojs.io/v1/ip/geo/%s.json', $ip_address );
+				$response = wp_remote_get( $url );
+				if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
+					$data = json_decode( wp_remote_retrieve_body( $response ), true );
+					if ( is_array( $data ) ) {
+						$country = sanitize_text_field( $data['country'] ?? '' );
+						$region  = sanitize_text_field( $data['region'] ?? '' );
+						$city    = sanitize_text_field( $data['city'] ?? '' );
+					}
+				}
+			}
 		}
 
-		if ( ! empty( $country ) ) {
-			$location = sprintf( '%s, %s, %s', $city, $region, $country );
-			if ( ! empty( $postal_code ) ) {
-				$location .= ', ' . $postal_code; }
-			return $location;
+		return array(
+			'city'        => $city,
+			'region'      => $region,
+			'country'     => $country,
+			'postal_code' => $postal_code,
+		);
+	}
+
+	/**
+	 * Get the location data for a US based zip code using the Zippopotam.us API.
+	 *
+	 * @param string $zipcode The US based zip code to get data for.
+	 *
+	 * @return array The location data for the zip code or an empty array if not found.
+	 */
+	public static function get_us_postal_code_data( string $zipcode ): array {
+		if ( empty( $zipcode ) ) {
+			return array();
 		}
-		return '';
+
+		// Sanitize and normalize ZIP code (5-digit or ZIP+4)
+		$zipcode = preg_replace( '/[^0-9\-]/', '', $zipcode );
+		
+		if ( ! preg_match( '/^\d{5}(-\d{4})?$/', $zipcode ) ) {
+			return array();
+		}
+
+		$url = sprintf( 'https://api.zippopotam.us/us/%s', rawurlencode( $zipcode ) );
+
+		$response = wp_remote_get(
+			$url,
+			array(
+				'timeout'   => 10,
+				'headers'   => array( 'Accept' => 'application/json' ),
+				'sslverify' => true,
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return array();
+		}
+
+		if ( 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			return array();
+		}
+
+		$data = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		if ( ! is_array( $data ) || empty( $data['places'][0] ) ) {
+			return array();
+		}
+
+		// Normalize the response into something predictable
+		$place = $data['places'][0];
+
+		$result = array(
+			'zipcode'   => $data['post code'] ?? '',
+			'country'   => $data['country'] ?? '',
+			'country_abbr' => $data['country abbreviation'] ?? '',
+			'state'     => $place['state'] ?? '',
+			'state_abbr'=> $place['state abbreviation'] ?? '',
+			'city'      => $place['place name'] ?? '',
+			'latitude'  => $place['latitude'] ?? '',
+			'longitude' => $place['longitude'] ?? '',
+		);
+
+		return $result;
+	}
+
+	/**
+	 * Determines if the current request or a specific IP address is from the United States.
+	 *
+	 * @param string $ip_address Optional. The IP address to check. If empty, the current request's IP is used.
+	 *
+	 * @return bool True if the IP address is detected as being from the United States, false otherwise.
+	 */
+	public static function is_us_based_ip( string $ip_address = '' ): bool {
+		if ( empty( $ip_address ) ) {
+			$ip_address = self::get_request_ip_address();
+		}
+
+		if ( empty( $ip_address ) ) {
+			return false;
+		}
+
+		// check server variables first
+		if ( isset( $_SERVER['GEOIP_COUNTRY_CODE'] ) && 'US' === $_SERVER['GEOIP_COUNTRY_CODE'] ) {
+			return true;
+		}
+
+		$url      = sprintf( 'https://ipapi.co/%s/json', $ip_address );
+		$response = wp_remote_get( $url );
+		if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
+			$data = json_decode( wp_remote_retrieve_body( $response ), true );
+			if ( isset( $data['country_code'] ) && 'US' === $data['country_code'] ) {
+				return true;
+			}
+		}
+
+		// fallback to geojs
+		$url      = sprintf( 'https://get.geojs.io/v1/ip/geo/%s.json', $ip_address );
+		$response = wp_remote_get( $url );
+		if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
+			$data = json_decode( wp_remote_retrieve_body( $response ), true );
+			if ( isset( $data['country_code'] ) && 'US' === $data['country_code'] ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/*
