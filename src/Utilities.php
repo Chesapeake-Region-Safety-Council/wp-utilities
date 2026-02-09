@@ -823,7 +823,7 @@ class Utilities {
 	 *
 	 * @param string $zipcode The US based zip code to get data for.
 	 *
-	 * @return array The location data for the zip code or an empty array if not found.
+	 * @return array{city: string, region: string, region_abbr: string, country: string, country_abbr: string, postal_code: string, latitude: string, longitude: string} The location data for the zip code or an empty array if not found.
 	 */
 	public static function get_us_postal_code_data( string $zipcode ): array {
 		if ( empty( $zipcode ) ) {
@@ -832,7 +832,7 @@ class Utilities {
 
 		// Sanitize and normalize ZIP code (5-digit or ZIP+4)
 		$zipcode = preg_replace( '/[^0-9\-]/', '', $zipcode );
-		
+
 		if ( ! preg_match( '/^\d{5}(-\d{4})?$/', $zipcode ) ) {
 			return array();
 		}
@@ -866,11 +866,11 @@ class Utilities {
 		$place = $data['places'][0];
 
 		$result = array(
-			'zipcode'   => $data['post code'] ?? '',
+			'postal_code'   => $data['post code'] ?? '',
 			'country'   => $data['country'] ?? '',
 			'country_abbr' => $data['country abbreviation'] ?? '',
-			'state'     => $place['state'] ?? '',
-			'state_abbr'=> $place['state abbreviation'] ?? '',
+			'region'     => $place['state'] ?? '',
+			'region_abbr'=> $place['state abbreviation'] ?? '',
 			'city'      => $place['place name'] ?? '',
 			'latitude'  => $place['latitude'] ?? '',
 			'longitude' => $place['longitude'] ?? '',
