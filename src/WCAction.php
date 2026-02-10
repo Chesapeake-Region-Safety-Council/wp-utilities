@@ -41,4 +41,26 @@ class WCAction {
 
 		return defined( 'REST_REQUEST' ) && REST_REQUEST && $is_rest_rote;
 	}
+
+	/**
+	 * Retrieves the draft order from the session if available. Useful if a darft order has been created and we
+	 * need to access it to attach information to it.
+	 *
+	 * @return \WC_Order|null The draft order object if found, or null if not available.
+	 */
+	public static function get_draft_order(): \WC_Order|null {
+		if ( WC()->session ) {
+			$order_id = WC()->session->get( 'store_api_draft_order' );
+
+			if ( ! empty( $order_id ) ) {
+				$order    = wc_get_order( $order_id );
+
+				if ( $order instanceof \WC_Order ) {
+					return $order;
+				}
+			}
+		}
+
+		return null;
+	}
 }
