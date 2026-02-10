@@ -866,14 +866,14 @@ class Utilities {
 		$place = $data['places'][0];
 
 		$result = array(
-			'postal_code'   => $data['post code'] ?? '',
-			'country'   => $data['country'] ?? '',
-			'country_abbr' => $data['country abbreviation'] ?? '',
-			'region'     => $place['state'] ?? '',
-			'region_abbr'=> $place['state abbreviation'] ?? '',
-			'city'      => $place['place name'] ?? '',
-			'latitude'  => $place['latitude'] ?? '',
-			'longitude' => $place['longitude'] ?? '',
+			'postal_code'   => sanitize_text_field( $data['post code'] ?? '' ),
+			'country'   => sanitize_text_field( $data['country'] ?? '' ),
+			'country_abbr' => sanitize_text_field( $data['country abbreviation'] ?? '' ),
+			'region'     => sanitize_text_field( $place['state'] ?? '' ),
+			'region_abbr'=> sanitize_text_field( $place['state abbreviation'] ?? '' ),
+			'city'      => sanitize_text_field( $place['place name'] ?? '' ),
+			'latitude'  => sanitize_text_field( $place['latitude'] ?? '' ),
+			'longitude' => sanitize_text_field( $place['longitude'] ?? '' ),
 		);
 
 		return $result;
