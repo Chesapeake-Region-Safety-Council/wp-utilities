@@ -1095,6 +1095,24 @@ class Utilities {
 	}
 
 	/**
+	 * Enqueues a plugin script and ensures it's printed early in the wp_head.
+	 *
+	 * @param string $handle The unique identifier for the script.
+	 * @param string $path The relative or absolute path to the script file.
+	 * @param array $deps Optional. An array of script dependencies. Defaults to an empty array.
+	 * @param string|null $strategy Optional. The loading strategy for the script. Use 'module' for module type or null for default behavior.
+	 * @param int $priority Optional. The priority for printing the script in wp_head. Default is 1.
+	 *
+	 * @return void
+	 */
+	public function print_plugin_script_early( string $handle, string $path, $deps = array(), $strategy = null, int $priority = 1 ): void {
+		$this->enqueue_plugin_script( $handle, $path, $deps, $strategy );
+		add_action( 'wp_head', function() use ( $handle ) {
+			wp_print_scripts( $handle );
+		}, $priority );
+	}
+
+	/**
 	 * Registers a plugin style with WordPress.
 	 *
 	 * @param string $handle The handle for the registered style.
@@ -1122,6 +1140,24 @@ class Utilities {
 	public function enqueue_plugin_style( string $handle, string $path, $deps = array(), $media = '' ): void {
 		$info = $this->get_plugin_file_uri_and_version( $path );
 		wp_enqueue_style( $handle, $info['url'], $deps, $info['version'], $media );
+	}
+
+	/**
+	 * Enqueues a plugin style and ensures it's printed early in the wp_head.
+	 *
+	 * @param string $handle The handle for the registered style.
+	 * @param string $path The relative path to the style file.
+	 * @param array $deps Optional. An array of dependencies for the style. Default is an empty array.
+	 * @param string $media Optional. The media for which this stylesheet has been defined. Default is an empty string.
+	 * @param int $priority Optional. The priority for printing the style in wp_head. Default is 1.
+	 *
+	 * @return void
+	 */
+	public function print_plugin_style_early( string $handle, string $path, $deps = array(), $media = '', int $priority = 1 ): void {
+		$this->enqueue_plugin_style( $handle, $path, $deps, $media );
+		add_action( 'wp_head', function() use ( $handle ) {
+			wp_print_styles( $handle );
+		}, $priority );
 	}
 
 	/**
