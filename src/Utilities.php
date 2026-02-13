@@ -1154,7 +1154,7 @@ class Utilities {
 	 * @return void
 	 */
 	public function print_plugin_style_early( string $handle, string $path, $deps = array(), $media = '', int $priority = 1 ): void {
-		$this->enqueue_plugin_style( $handle, $path, $deps, $media );
+		$this->register_plugin_style( $handle, $path, $deps, $media );
 		add_action( 'wp_head', function() use ( $handle ) {
 			wp_print_styles( $handle );
 		}, $priority );
