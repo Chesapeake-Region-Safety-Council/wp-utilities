@@ -74,6 +74,13 @@ class Utilities {
 	}
 
 	/**
+	 * Get the full path to a wp-content/mu-plugins folder.
+	 */
+	public static function get_mu_plugin_folders_path(): string {
+		return defined( 'WPMU_PLUGIN_DIR' ) ? WPMU_PLUGIN_DIR : WP_CONTENT_DIR . '/mu-plugins';
+	}
+
+	/**
 	 * Get the full path to a plugin file
 	 */
 	public static function get_plugin_file_full_path( string $plugin_folder_name_and_main_file ): string {
@@ -82,12 +89,20 @@ class Utilities {
 	}
 
 	/**
+	 * Get the full path to a mu-plugin file
+	 */
+	public static function get_mu_plugin_file_full_path( string $mu_plugin_folder_name_and_main_file ): string {
+		$clean_mu_plugin_folder_path = rtrim( self::get_mu_plugin_folders_path(), DIRECTORY_SEPARATOR );
+		return sprintf( '%s%s%s', $clean_mu_plugin_folder_path, DIRECTORY_SEPARATOR, $mu_plugin_folder_name_and_main_file );
+	}
+
+	/**
 	 * Remove the folder path to the WP_CONTENT_DIR folder from a file path and return the relative path to the file.
 	 */
 	public static function get_wp_content_relative_file_path( string $path, string $remove_additional_subfolder = '' ): string {
 		$wp_content_path = WP_CONTENT_DIR;
 
-		if ( 'plugins' === $remove_additional_subfolder || 'themes' === $remove_additional_subfolder || 'uploads' === $remove_additional_subfolder ) {
+		if ( 'plugins' === $remove_additional_subfolder || 'themes' === $remove_additional_subfolder || 'uploads' === $remove_additional_subfolder || 'mu-plugins' === $remove_additional_subfolder ) {
 			$wp_content_path = sprintf( '%s/%s', $wp_content_path, $remove_additional_subfolder );
 		}
 
@@ -1061,6 +1076,25 @@ class Utilities {
 	}
 
 	/**
+	 * Enqueues a plugin script with the specified handle and path.
+	 *
+	 * @param string $handle The unique identifier for the script.
+	 * @param string $path The relative or absolute path to the script file.
+	 * @param array $deps Optional. An array of script dependencies. Defaults to an empty array.
+	 * @param string|null $strategy Optional. The loading strategy for the script. Use 'module' for module type or null for default behavior.
+	 *
+	 * @return void
+	 */
+	public function enqueue_plugin_script( string $handle, string $path, $deps = array(), $strategy = null ): void {
+		$info = $this->get_plugin_file_uri_and_version( $path );
+		if ( 'module' === $strategy ) {
+			wp_enqueue_script_module( $handle, $info['url'], $deps, $info['version'] );
+		} else {
+			wp_enqueue_script( $handle, $info['url'], $deps, $info['version'], $strategy );
+		}
+	}
+
+	/**
 	 * Registers a plugin style with WordPress.
 	 *
 	 * @param string $handle The handle for the registered style.
@@ -1073,6 +1107,21 @@ class Utilities {
 	public function register_plugin_style( string $handle, string $path, $deps = array(), $media = '' ): void {
 		$info = $this->get_plugin_file_uri_and_version( $path );
 		wp_register_style( $handle, $info['url'], $deps, $info['version'], $media );
+	}
+
+	/**
+	 * Enqueues a plugin style with WordPress.
+	 *
+	 * @param string $handle The handle for the registered style.
+	 * @param string $path The relative path to the style file.
+	 * @param array $deps Optional. An array of dependencies for the style. Default is an empty array.
+	 * @param string $media Optional. The media for which this stylesheet has been defined. Default is an empty string.
+	 *
+	 * @return void
+	 */
+	public function enqueue_plugin_style( string $handle, string $path, $deps = array(), $media = '' ): void {
+		$info = $this->get_plugin_file_uri_and_version( $path );
+		wp_enqueue_style( $handle, $info['url'], $deps, $info['version'], $media );
 	}
 
 	/**
