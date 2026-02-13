@@ -1095,20 +1095,38 @@ class Utilities {
 	}
 
 	/**
-	 * Enqueues a plugin script and ensures it's printed early in the wp_head.
+	 * Enqueues a plugin script and ensures it's printed early by moving it to the front of the queue.
 	 *
 	 * @param string $handle The unique identifier for the script.
 	 * @param string $path The relative or absolute path to the script file.
 	 * @param array $deps Optional. An array of script dependencies. Defaults to an empty array.
 	 * @param string|null $strategy Optional. The loading strategy for the script. Use 'module' for module type or null for default behavior.
-	 * @param int $priority Optional. The priority for printing the script in wp_head. Default is 1.
+	 * @param int $priority Optional. The priority for the move to front action. Default is 1.
 	 *
 	 * @return void
 	 */
 	public function print_plugin_script_early( string $handle, string $path, $deps = array(), $strategy = null, int $priority = 1 ): void {
 		$this->enqueue_plugin_script( $handle, $path, $deps, $strategy );
-		add_action( 'wp_head', function() use ( $handle ) {
-			wp_print_scripts( $handle );
+		$this->move_script_to_front( $handle, $priority );
+	}
+
+	/**
+	 * Moves a script to the front of the queue.
+	 *
+	 * @param string $handle The script handle.
+	 * @param int $priority Optional. The priority for the wp_print_scripts action. Default is 1.
+	 * @return void
+	 */
+	public function move_script_to_front( string $handle, int $priority = 1 ): void {
+		add_action( 'wp_print_scripts', function() use ( $handle ) {
+			global $wp_scripts;
+			if ( ! ( $wp_scripts instanceof \WP_Scripts ) ) {
+				return;
+			}
+			if ( in_array( $handle, $wp_scripts->queue, true ) ) {
+				$wp_scripts->queue = array_diff( $wp_scripts->queue, array( $handle ) );
+				array_unshift( $wp_scripts->queue, $handle );
+			}
 		}, $priority );
 	}
 
@@ -1143,20 +1161,38 @@ class Utilities {
 	}
 
 	/**
-	 * Enqueues a plugin style and ensures it's printed early in the wp_head.
+	 * Enqueues a plugin style and ensures it's printed early by moving it to the front of the queue.
 	 *
 	 * @param string $handle The handle for the registered style.
 	 * @param string $path The relative path to the style file.
 	 * @param array $deps Optional. An array of dependencies for the style. Default is an empty array.
 	 * @param string $media Optional. The media for which this stylesheet has been defined. Default is an empty string.
-	 * @param int $priority Optional. The priority for printing the style in wp_head. Default is 1.
+	 * @param int $priority Optional. The priority for the move to front action. Default is 1.
 	 *
 	 * @return void
 	 */
 	public function print_plugin_style_early( string $handle, string $path, $deps = array(), $media = '', int $priority = 1 ): void {
-		$this->register_plugin_style( $handle, $path, $deps, $media );
-		add_action( 'wp_head', function() use ( $handle ) {
-			wp_print_styles( $handle );
+		$this->enqueue_plugin_style( $handle, $path, $deps, $media );
+		$this->move_style_to_front( $handle, $priority );
+	}
+
+	/**
+	 * Moves a style to the front of the queue.
+	 *
+	 * @param string $handle The style handle.
+	 * @param int $priority Optional. The priority for the wp_print_styles action. Default is 1.
+	 * @return void
+	 */
+	public function move_style_to_front( string $handle, int $priority = 1 ): void {
+		add_action( 'wp_print_styles', function() use ( $handle ) {
+			global $wp_styles;
+			if ( ! ( $wp_styles instanceof \WP_Styles ) ) {
+				return;
+			}
+			if ( in_array( $handle, $wp_styles->queue, true ) ) {
+				$wp_styles->queue = array_diff( $wp_styles->queue, array( $handle ) );
+				array_unshift( $wp_styles->queue, $handle );
+			}
 		}, $priority );
 	}
 
