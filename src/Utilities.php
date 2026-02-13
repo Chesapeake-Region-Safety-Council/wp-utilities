@@ -1118,6 +1118,10 @@ class Utilities {
 	 * @return void
 	 */
 	public function move_script_to_front( string $handle, int $priority = 1 ): void {
+		if ( ! function_exists( '\add_action' ) ) {
+			return;
+		}
+
 		add_action( 'wp_print_scripts', function() use ( $handle ) {
 			global $wp_scripts;
 			if ( ! ( $wp_scripts instanceof \WP_Scripts ) ) {
@@ -1140,7 +1144,7 @@ class Utilities {
 	 *
 	 * @return void
 	 */
-	public function register_plugin_style( string $handle, string $path, $deps = array(), $media = '' ): void {
+	public function register_plugin_style( string $handle, string $path, mixed $deps = array(), string $media = 'all' ): void {
 		$info = $this->get_plugin_file_uri_and_version( $path );
 		wp_register_style( $handle, $info['url'], $deps, $info['version'], $media );
 	}
@@ -1150,12 +1154,12 @@ class Utilities {
 	 *
 	 * @param string $handle The handle for the registered style.
 	 * @param string $path The relative path to the style file.
-	 * @param array $deps Optional. An array of dependencies for the style. Default is an empty array.
+	 * @param mixed $deps Optional. An array of dependencies for the style. Default is an empty array.
 	 * @param string $media Optional. The media for which this stylesheet has been defined. Default is an empty string.
 	 *
 	 * @return void
 	 */
-	public function enqueue_plugin_style( string $handle, string $path, $deps = array(), $media = '' ): void {
+	public function enqueue_plugin_style( string $handle, string $path, mixed $deps = array(), string $media = 'all' ): void {
 		$info = $this->get_plugin_file_uri_and_version( $path );
 		wp_enqueue_style( $handle, $info['url'], $deps, $info['version'], $media );
 	}
@@ -1171,7 +1175,7 @@ class Utilities {
 	 *
 	 * @return void
 	 */
-	public function print_plugin_style_early( string $handle, string $path, $deps = array(), $media = '', int $priority = 1 ): void {
+	public function print_plugin_style_early( string $handle, string $path, mixed $deps = array(), string $media = 'all', int $priority = 1 ): void {
 		$this->enqueue_plugin_style( $handle, $path, $deps, $media );
 		$this->move_style_to_front( $handle, $priority );
 	}
@@ -1184,6 +1188,10 @@ class Utilities {
 	 * @return void
 	 */
 	public function move_style_to_front( string $handle, int $priority = 1 ): void {
+		if ( ! function_exists( '\add_action' ) ) {
+			return;
+		}
+
 		add_action( 'wp_print_styles', function() use ( $handle ) {
 			global $wp_styles;
 			if ( ! ( $wp_styles instanceof \WP_Styles ) ) {
