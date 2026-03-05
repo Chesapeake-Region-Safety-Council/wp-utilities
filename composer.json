@@ -1,6 +1,7 @@
 {
   "name": "crsc/wp-utilities",
   "description": "A collection of WordPress and WooCommerce utility classes and traits used across CRSC plugins.",
+  "version": "1.0.1",
   "type": "library",
   "license": "GPL-2.0-or-later",
   "authors": [
