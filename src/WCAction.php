@@ -9,6 +9,7 @@ class WCAction {
 	 * @return bool True if the request is an AJAX action, false otherwise.
 	 */
 	public static function is_ajax_action(): bool {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		return defined( 'DOING_AJAX' ) && DOING_AJAX && isset( $_REQUEST['wc-ajax'] );
 	}
 
@@ -18,6 +19,7 @@ class WCAction {
 	 * @return bool True if the current request is an "add to cart" AJAX action, false otherwise.
 	 */
 	public static function is_add_to_cart_ajax_action(): bool {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		return self::is_ajax_action() && 'add_to_cart' === $_REQUEST['wc-ajax'];
 	}
 
@@ -53,7 +55,7 @@ class WCAction {
 			$order_id = WC()->session->get( 'store_api_draft_order' );
 
 			if ( ! empty( $order_id ) ) {
-				$order    = wc_get_order( $order_id );
+				$order = wc_get_order( $order_id );
 
 				if ( $order instanceof \WC_Order ) {
 					return $order;

@@ -19,7 +19,7 @@ class WCOrder {
 		}
 
 		foreach ( $shipping_items as $shipping_item ) {
-			$item_name = $shipping_item->get_name();
+			$item_name    = $shipping_item->get_name();
 			$method_title = method_exists( $shipping_item, 'get_method_title' ) ? (string) $shipping_item->get_method_title() : '';
 
 			if ( str_contains( strtolower( $item_name ), 'pickup' ) || str_contains( strtolower( $method_title ), 'pickup' ) ) {

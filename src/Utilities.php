@@ -188,7 +188,7 @@ class Utilities {
 	 */
 	public static function is_localhost(): bool {
 		$tlds         = array( 'localhost', '127.0.0.1', 'ddev.site', 'lando.site' );
-		$current_host = parse_url( home_url(), PHP_URL_HOST ) ?: ( $_SERVER['HTTP_HOST'] ?? '' );
+		$current_host = wp_parse_url( home_url(), PHP_URL_HOST ) ?: ( $_SERVER['HTTP_HOST'] ?? '' );
 		foreach ( $tlds as $tld ) {
 			if ( str_contains( $current_host, $tld ) ) {
 				return true;
@@ -375,6 +375,7 @@ class Utilities {
 	 * @return void
 	 */
 	public static function var_dump_error_log( $object_analyze = null ): void {
+		// phpcs:disable
 		if ( empty( ob_get_level() ) || 0 === ob_get_level() ) {
 			ob_start();
 			var_dump( $object_analyze );
@@ -384,6 +385,7 @@ class Utilities {
 			$contents = self::output_buffering_cast( $object_analyze );
 		}
 		error_log( $contents );
+		// phpcs:enable
 	}
 
 	/**
@@ -395,10 +397,12 @@ class Utilities {
 	 */
 	public static function print_r_error_log( $object_analyze = null ): void {
 		if ( empty( ob_get_level() ) || 0 === ob_get_level() ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 			$contents = print_r( $object_analyze, true );
 		} else {
 			$contents = self::output_buffering_cast( $object_analyze );
 		}
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		error_log( $contents );
 	}
 
@@ -414,15 +418,18 @@ class Utilities {
 	public static function debug_backtrace_error_log(): void {
 		if ( empty( ob_get_level() ) || 0 === ob_get_level() ) {
 			ob_start();
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_debug_print_backtrace
 			debug_print_backtrace();
 			$contents = ob_get_contents();
 			ob_end_clean();
 		} else {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace
 			$contents = self::output_buffering_cast( debug_backtrace() );
 		}
 		if ( is_null( $contents ) ) {
 			$contents = '';
 		}
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		error_log( $contents );
 	}
 
@@ -442,6 +449,7 @@ class Utilities {
 		} elseif ( is_array( $object_analyze ) ) {
 			$json = wp_json_encode( $object_analyze );
 			if ( empty( $json ) ) {
+				// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
 				$json = serialize( $object_analyze );
 			}
 			return '(NOTE: output buffering is on, so we cannot var_dump to the error log. This thing passed to the error_log function is a an array. We are converting it to a JSON string though for easier reading in the error_log:) ' . $json;
@@ -610,7 +618,7 @@ class Utilities {
 	 * @return int|false Returns the validated integer if it falls within the range, or false otherwise.
 	 */
 	public static function within_error_range( mixed $value ): int|false {
-		if ( self::within_400_range( $value) || self::within_500_range( $value ) ) {
+		if ( self::within_400_range( $value ) || self::within_500_range( $value ) ) {
 			return true;
 		}
 
@@ -621,13 +629,13 @@ class Utilities {
 	 * Sanitizes a string representing a monetary value by removing any non-numeric and non-decimal characters.
 	 * Ensures the result has a maximum of two decimal places.
 	 *
-	 * @param string $string The input string representing a monetary value, which may contain unwanted characters.
+	 * @param string $string_value The input string representing a monetary value, which may contain unwanted characters.
 	 *
 	 * @return string A sanitized string containing only numeric characters and one decimal point,
 	 *                with a maximum of two decimal places.
 	 */
-	public static function sanitize_money_string( string $string ): string {
-		$clean = preg_replace( '/[^0-9.]/', '', $string );
+	public static function sanitize_money_string( string $string_value ): string {
+		$clean = preg_replace( '/[^0-9.]/', '', $string_value );
 		if ( strpos( $clean, '.' ) !== false ) {
 			$parts        = explode( '.', $clean );
 			$integer_part = $parts[0];
@@ -675,44 +683,93 @@ class Utilities {
 	 *
 	 * This method analyzes the site's home URL to identify and return
 	 * a specific site identifier, such as 'oshamidatlantic',
-	 * 'crscsafetyconference', or 'chesapeake'.
+	 * 'conference', or 'chesapeake'.
+	 *
+	 * Supports override via CRSC_ENVIRONMENT constant or environment variable.
 	 *
 	 * @return string The identifier of the current site.
 	 */
 	public static function which_site(): string {
+		$site = null;
+		if ( defined( 'CRSC_ENVIRONMENT' ) ) {
+			$site = (string) CRSC_ENVIRONMENT;
+		} else {
+			$env_site = getenv( 'CRSC_ENVIRONMENT' );
+			if ( false !== $env_site ) {
+				$site = (string) $env_site;
+			}
+		}
+
+		if ( $site ) {
+			return match ( strtolower( $site ) ) {
+				'conference', 'crscsafetyconference' => 'conference',
+				'oshamidatlantic'                     => 'oshamidatlantic',
+				'material_order', 'mits.chesapeake'   => 'material_order',
+				'shop', 'shop.chesapeake'             => 'shop',
+				default                               => 'chesapeake',
+			};
+		}
+
 		$home_url = home_url( '/' );
 		if ( str_contains( $home_url, 'oshamidatlantic' ) ) {
-			return 'oshamidatlantic'; }
+			return 'oshamidatlantic';
+		}
 		if ( str_contains( $home_url, 'crscsafetyconference' ) ) {
-			return 'crscsafetyconference'; }
+			return 'conference';
+		}
+		if ( str_contains( $home_url, 'shop.chesapeake' ) ) {
+			return 'shop';
+		}
+		if ( str_contains( $home_url, 'mits.chesapeake' ) ) {
+			return 'material_order';
+		}
 		return 'chesapeake';
 	}
 
 	/**
 	 * Determines if the current site matches the 'oshamidatlantic' keyword.
 	 *
-	 * @return bool Returns true if the site identifier contains 'oshamidatlantic', otherwise false.
+	 * @return bool Returns true if the site identifier is 'oshamidatlantic', otherwise false.
 	 */
 	public static function is_oshamidatlantic(): bool {
-		return str_contains( self::which_site(), 'oshamidatlantic' ); }
+		return 'oshamidatlantic' === self::which_site();
+	}
 
 	/**
-	 * Determines if the current site is associated with Chesapeake.
+	 * Determines if the current site is the primary Chesapeake website.
 	 *
-	 * @return bool Returns true if the site identifier contains 'chesapeake', otherwise false.
+	 * @return bool Returns true if the site identifier is 'chesapeake', otherwise false.
 	 */
 	public static function is_chesapeake(): bool {
-		return str_contains( self::which_site(), 'chesapeake' ); }
+		return 'chesapeake' === self::which_site();
+	}
+
+	/**
+	 * Determines if the current site is the Chesapeake shop/online store website.
+	 *
+	 * @return bool Returns true if the site identifier is 'shop', otherwise false.
+	 */
+	public static function is_shop_chesapeake(): bool {
+		return 'shop' === self::which_site();
+	}
 
 	/**
 	 * Determines if the current site is related to a safety conference.
 	 *
-	 * This method checks if the site identifier contains the substring 'crscsafetyconference'.
-	 *
-	 * @return bool Returns true if the site is identified as a safety conference, false otherwise.
+	 * @return bool Returns true if the site identifier is 'conference', otherwise false.
 	 */
 	public static function is_safety_conference(): bool {
-		return str_contains( self::which_site(), 'crscsafetyconference' ); }
+		return 'conference' === self::which_site();
+	}
+
+	/**
+	 * Determines if the current site is the material order inventory system for Chesapeake.
+	 *
+	 * @return bool True if the site matches 'material_order', false otherwise.
+	 */
+	public static function is_material_order_inventory_chesapeake(): bool {
+		return 'material_order' === self::which_site();
+	}
 
 	/**
 	 * Retrieves the name of the site as defined in the WordPress settings.
@@ -720,7 +777,8 @@ class Utilities {
 	 * @return string The name of the site.
 	 */
 	public static function get_site_name(): string {
-		return get_bloginfo( 'name' ); }
+		return get_bloginfo( 'name' );
+	}
 
 	/**
 	 * Retrieves the inner HTML of the specified DOM element as a string.
@@ -731,7 +789,9 @@ class Utilities {
 	 */
 	public static function get_inner_html( \DOMElement $element ): string {
 		$inner_html = '';
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		foreach ( $element->childNodes as $child ) {
+			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 			$inner_html .= $element->ownerDocument->saveHTML( $child );
 		}
 		return $inner_html;
@@ -746,9 +806,11 @@ class Utilities {
 	 * @return void This method does not
 	 */
 	public static function set_inner_html( \DOMElement $element, string $html ): void {
+		// // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		$fragment = $element->ownerDocument->createDocumentFragment();
 		$fragment->appendXML( $html );
 		while ( $element->hasChildNodes() ) {
+			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 			$element->removeChild( $element->firstChild ); }
 		$element->appendChild( $fragment );
 	}
@@ -881,14 +943,14 @@ class Utilities {
 		$place = $data['places'][0];
 
 		$result = array(
-			'postal_code'   => sanitize_text_field( $data['post code'] ?? '' ),
-			'country'   => sanitize_text_field( $data['country'] ?? '' ),
+			'postal_code'  => sanitize_text_field( $data['post code'] ?? '' ),
+			'country'      => sanitize_text_field( $data['country'] ?? '' ),
 			'country_abbr' => sanitize_text_field( $data['country abbreviation'] ?? '' ),
-			'region'     => sanitize_text_field( $place['state'] ?? '' ),
-			'region_abbr'=> sanitize_text_field( $place['state abbreviation'] ?? '' ),
-			'city'      => sanitize_text_field( $place['place name'] ?? '' ),
-			'latitude'  => sanitize_text_field( $place['latitude'] ?? '' ),
-			'longitude' => sanitize_text_field( $place['longitude'] ?? '' ),
+			'region'       => sanitize_text_field( $place['state'] ?? '' ),
+			'region_abbr'  => sanitize_text_field( $place['state abbreviation'] ?? '' ),
+			'city'         => sanitize_text_field( $place['place name'] ?? '' ),
+			'latitude'     => sanitize_text_field( $place['latitude'] ?? '' ),
+			'longitude'    => sanitize_text_field( $place['longitude'] ?? '' ),
 		);
 
 		return $result;
@@ -1122,16 +1184,20 @@ class Utilities {
 			return;
 		}
 
-		add_action( 'wp_print_scripts', function() use ( $handle ) {
-			global $wp_scripts;
-			if ( ! ( $wp_scripts instanceof \WP_Scripts ) ) {
-				return;
-			}
-			if ( in_array( $handle, $wp_scripts->queue, true ) ) {
-				$wp_scripts->queue = array_diff( $wp_scripts->queue, array( $handle ) );
-				array_unshift( $wp_scripts->queue, $handle );
-			}
-		}, $priority );
+		add_action(
+			'wp_print_scripts',
+			function () use ( $handle ) {
+				global $wp_scripts;
+				if ( ! ( $wp_scripts instanceof \WP_Scripts ) ) {
+					return;
+				}
+				if ( in_array( $handle, $wp_scripts->queue, true ) ) {
+					$wp_scripts->queue = array_diff( $wp_scripts->queue, array( $handle ) );
+					array_unshift( $wp_scripts->queue, $handle );
+				}
+			},
+			$priority
+		);
 	}
 
 	/**
@@ -1192,16 +1258,20 @@ class Utilities {
 			return;
 		}
 
-		add_action( 'wp_print_styles', function() use ( $handle ) {
-			global $wp_styles;
-			if ( ! ( $wp_styles instanceof \WP_Styles ) ) {
-				return;
-			}
-			if ( in_array( $handle, $wp_styles->queue, true ) ) {
-				$wp_styles->queue = array_diff( $wp_styles->queue, array( $handle ) );
-				array_unshift( $wp_styles->queue, $handle );
-			}
-		}, $priority );
+		add_action(
+			'wp_print_styles',
+			function () use ( $handle ) {
+				global $wp_styles;
+				if ( ! ( $wp_styles instanceof \WP_Styles ) ) {
+					return;
+				}
+				if ( in_array( $handle, $wp_styles->queue, true ) ) {
+					$wp_styles->queue = array_diff( $wp_styles->queue, array( $handle ) );
+					array_unshift( $wp_styles->queue, $handle );
+				}
+			},
+			$priority
+		);
 	}
 
 	/**
@@ -1222,7 +1292,7 @@ class Utilities {
 	 * @return array An array of common email domain and disposable email domains.
 	 */
 	public static function get_common_email_domains(): array {
-		return [
+		return array(
 			'10minutemail.co.uk',
 			'10minutemail.com',
 			'10minutemail.net',
@@ -1571,6 +1641,6 @@ class Utilities {
 			'zoho.com',
 			'zohomail.com',
 			'zonnet.nl',
-		];
+		);
 	}
 }
