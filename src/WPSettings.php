@@ -13,11 +13,11 @@ class WPSettings {
 	 * @return string
 	 */
 	public static function get_sf_mode(): string {
-		if ( defined( 'CRSC_SALESFORCE_ENVIRONMENT' ) ) {
-			return (string) constant( 'CRSC_SALESFORCE_ENVIRONMENT' );
+		if ( defined( 'CRSC_DATABRIDGE_SYNC_SALESFORCE_MODE' ) ) {
+			return (string) constant( 'CRSC_DATABRIDGE_SYNC_SALESFORCE_MODE' );
 		}
 
-		$env_val = getenv( 'CRSC_SALESFORCE_ENVIRONMENT' );
+		$env_val = getenv( 'CRSC_DATABRIDGE_SYNC_SALESFORCE_MODE' );
 		if ( false !== $env_val && '' !== $env_val ) {
 			return (string) $env_val;
 		}
