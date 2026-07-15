@@ -131,6 +131,7 @@ class CourseClass extends ModelsSalesforce {
 		if ( function_exists( '\tribe_events' ) ) {
 			try {
 				tribe_events()->by( 'ID', $post_id )->set( '_salesforce_class_id', $value )->save();
+				return;
 			} catch ( \Exception $e ) {
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				error_log( 'Error updating Salesforce Class ID: ' . $e->getMessage() . ' ' . __METHOD__ );
@@ -163,6 +164,7 @@ class CourseClass extends ModelsSalesforce {
 		if ( function_exists( '\tribe_events' ) ) {
 			try {
 				tribe_events()->by( 'ID', $post_id )->set( '_salesforce_course_id', $value )->save();
+				return;
 			} catch ( \Exception $e ) {
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				error_log( 'Error updating Salesforce Class ID: ' . $e->getMessage() . ' ' . __METHOD__ );
@@ -237,5 +239,32 @@ class CourseClass extends ModelsSalesforce {
 		}
 
 		return $occurrence_ids;
+	}
+
+	/**
+	 * Updates the additional class information for the class associated with a post or event.
+	 *
+	 * This method attempts to update the `_additional_class_information` meta key
+	 * for the given post or event. If the Events Calendar plugin is available and the
+	 * post corresponds to an event, it uses the proper method to update the value.
+	 * Otherwise, it updates the post meta directly.
+	 *
+	 * @param string|int $post_id The ID of the post or event to update.
+	 * @param string $value The value to set for the `_additional_class_information` meta key.
+	 *
+	 * @return void
+	 */
+	public static function update_additional_class_information( string|int $post_id, string $value ): void {
+		if ( function_exists( '\tribe_events' ) ) {
+			try {
+				tribe_events()->by( 'ID', $post_id )->set( '_addtional_class_information', $value )->save();
+				return;
+			} catch ( \Exception $e ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( 'Error updating Salesforce Class ID: ' . $e->getMessage() . ' ' . __METHOD__ );
+			}
+		}
+
+		update_post_meta( $post_id, '_addtional_class_information', $value );
 	}
 }
