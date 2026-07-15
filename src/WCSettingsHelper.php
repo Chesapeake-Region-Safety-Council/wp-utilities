@@ -97,4 +97,11 @@ trait WCSettingsHelper {
 	public function get_clean_wc_country_code( string $woocommerce_setting_country_state_code ): string {
 		return WCSettings::get_clean_wc_country_code( $woocommerce_setting_country_state_code );
 	}
+
+	/**
+	 * Get the Salesforce mode (live or sandbox/test).
+	 */
+	public function get_sf_mode(): string {
+		return WCSettings::get_sf_mode();
+	}
 }

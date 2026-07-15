@@ -5,6 +5,7 @@ namespace CRSC\WPUtilities\Salesforce;
 
 use CRSC\WPUtilities\WCSettingsHelper;
 use CRSC\WPUtilities\WCSettings;
+use CRSC\WPUtilities\WPSettings;
 use CRSC\WPUtilities\WCOrder;
 
 /**
@@ -321,11 +322,7 @@ class Salesforce {
 	 * @return string
 	 */
 	public static function get_sf_environment(): string {
-		if ( defined( 'CRSC_SALESFORCE_ENVIRONMENT' ) ) {
-			return CRSC_SALESFORCE_ENVIRONMENT;
-		}
-
-		return WCSettings::get_sf_mode();
+		return WPSettings::get_sf_mode();
 	}
 
 	/**

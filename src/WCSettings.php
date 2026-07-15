@@ -165,4 +165,13 @@ class WCSettings {
 		}
 		return $woocommerce_setting_country_state_code;
 	}
+
+	/**
+	 * Get the Salesforce mode (live or sandbox/test).
+	 *
+	 * @return string
+	 */
+	public static function get_sf_mode(): string {
+		return WPSettings::get_sf_mode();
+	}
 }
