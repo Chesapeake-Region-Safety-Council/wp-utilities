@@ -148,6 +148,10 @@ class CourseClass extends ModelsSalesforce {
 	 * @return mixed
 	 */
 	public static function get_class_id( string|int $post_id ): mixed {
+		if ( function_exists( '\tribe_get_event_meta' ) ) {
+			return tribe_get_event_meta( $post_id, '_salesforce_class_id', true );
+		}
+
 		return get_post_meta( $post_id, '_salesforce_class_id', true );
 	}
 
@@ -182,6 +186,10 @@ class CourseClass extends ModelsSalesforce {
 	 * @return string The Salesforce course ID associated with the post.
 	 */
 	public static function get_course_id( string|int $post_id ): mixed {
+		if ( function_exists( '\tribe_get_event_meta' ) ) {
+			return tribe_get_event_meta( $post_id, '_salesforce_course_id', true );
+		}
+
 		return get_post_meta( $post_id, '_salesforce_course_id', true );
 	}
 
@@ -266,5 +274,27 @@ class CourseClass extends ModelsSalesforce {
 		}
 
 		update_post_meta( $post_id, '_addtional_class_information', $value );
+	}
+
+	/**
+	 * Retrieves additional class information for a given post ID.
+	 *
+	 * This method attempts to fetch the metadata associated with `_additional_class_information`
+	 * for a given post. If the `tribe_get_event_meta` function exists (indicating integration
+	 * with The Events Calendar plugin), it uses that function to get the metadata. Otherwise,
+	 * it falls back to using WordPress's `get_post_meta` function.
+	 *
+	 * @param string|int $post_id The ID of the post for which additional class information
+	 *                            should be retrieved.
+	 *
+	 * @return mixed The value of the `_additional_class_information` metadata. The return type
+	 *               depends on how the metadata is stored or returned by the applicable function.
+	 */
+	public function get_additional_class_information( string|int $post_id ): mixed {
+		if ( function_exists( '\tribe_get_event_meta' ) ) {
+			return tribe_get_event_meta( $post_id, '_additional_class_information', true );
+		}
+
+		return get_post_meta( $post_id, '_additional_class_information', true );
 	}
 }
