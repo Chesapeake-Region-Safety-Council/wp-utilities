@@ -290,7 +290,7 @@ class CourseClass extends ModelsSalesforce {
 	 * @return mixed The value of the `_additional_class_information` metadata. The return type
 	 *               depends on how the metadata is stored or returned by the applicable function.
 	 */
-	public function get_additional_class_information( string|int $post_id ): mixed {
+	public static function get_additional_class_information( string|int $post_id ): mixed {
 		if ( function_exists( '\tribe_get_event_meta' ) ) {
 			return tribe_get_event_meta( $post_id, '_additional_class_information', true );
 		}
@@ -307,8 +307,11 @@ class CourseClass extends ModelsSalesforce {
 	 */
 	public function is_class_event( int|string|null|false $post_id = 0 ): bool {
 		$use_post_id = $post_id;
-		// use the current global post ID to determine if this a class
-		if ( empty( $use_post_id ) ) {
+
+		if ( empty( $use_post_id ) && ! empty( $this->post_id ) ) {
+			$use_post_id = $this->post_id;
+		} elseif ( empty( $use_post_id ) ) {
+			// use the current global post ID to determine if this a class
 			$use_post_id = get_the_ID();
 		}
 
