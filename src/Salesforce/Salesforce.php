@@ -25,6 +25,11 @@ class Salesforce {
 	protected int $post_id = 0;
 
 	/**
+	 * @var int WordPress Taxonomy Term ID
+	 */
+	protected int $term_id = 0;
+
+	/**
 	 * @var mixed WooCommerce data object (Product, Order, etc.)
 	 */
 	protected mixed $wc_object = null;
@@ -34,13 +39,19 @@ class Salesforce {
 	 *
 	 * @param int|string|object $id_or_object Post ID or WooCommerce object.
 	 */
-	public function __construct( int|string|object $id_or_object ) {
+	public function __construct( int|string|object $id_or_object, string $object_type = 'post' ) {
 		if ( is_numeric( $id_or_object ) ) {
-			$this->post_id = (int) $id_or_object;
+			if ( 'term' === $object_type ) {
+				$this->term_id = (int) $id_or_object;
+			} else {
+				$this->post_id = (int) $id_or_object;
+			}
 		} elseif ( is_object( $id_or_object ) ) {
 			if ( $id_or_object instanceof \WC_Order || $id_or_object instanceof \WC_Product ) {
 				$this->wc_object = $id_or_object;
 				$this->post_id   = (int) $id_or_object->get_id();
+			} elseif ( isset( $id_or_object->ID ) && $id_or_object instanceof \WP_Term ) {
+				$this->term_id = (int) $id_or_object->term_id;
 			} elseif ( isset( $id_or_object->ID ) ) {
 				$this->post_id = (int) $id_or_object->ID;
 			}
@@ -80,6 +91,15 @@ class Salesforce {
 			if ( 0 !== $this->post_id ) {
 				$this->wc_object->save();
 			}
+		} elseif ( ! empty( $this->term_id ) ) {
+			// Existing term
+			update_term_meta( $this->term_id, $meta_key, $salesforce_record_id );
+			update_term_meta( $this->term_id, '_salesforce_sync_mode', $mode );
+			update_term_meta( $this->term_id, '_salesforce_sync_time', $sync_time );
+
+			if ( ! empty( $salesforce_object_type ) ) {
+				update_term_meta( $this->term_id, '_salesforce_object_type', $salesforce_object_type );
+			}
 		} else {
 			// Existing post or object already in DB
 			update_post_meta( $this->post_id, $meta_key, $salesforce_record_id );
@@ -112,6 +132,8 @@ class Salesforce {
 		if ( $this->wc_object ) {
 			$this->wc_object->update_meta_data( '_salesforce_record_name', $salesforce_record_name );
 			$this->wc_object->save();
+		} elseif ( ! empty( $this->term_id ) ) {
+			update_term_meta( $this->term_id, '_salesforce_record_name', $salesforce_record_name );
 		} else {
 			update_post_meta( $this->post_id, '_salesforce_record_name', $salesforce_record_name );
 		}
@@ -125,6 +147,8 @@ class Salesforce {
 	public function get_salesforce_record_name(): string {
 		if ( $this->wc_object ) {
 			return (string) $this->wc_object->get_meta( '_salesforce_record_name', true );
+		} elseif ( ! empty( $this->term_id ) ) {
+			return (string) get_term_meta( $this->term_id, '_salesforce_record_name', true );
 		} else {
 			return (string) get_post_meta( $this->post_id, '_salesforce_record_name', true );
 		}
@@ -152,6 +176,11 @@ class Salesforce {
 			if ( 0 !== $this->post_id ) {
 				$this->wc_object->save();
 			}
+		} elseif ( ! empty( $this->term_id ) ) {
+			delete_term_meta( $this->term_id, $meta_key );
+			delete_term_meta( $this->term_id, '_salesforce_sync_mode' );
+			delete_term_meta( $this->term_id, '_salesforce_sync_time' );
+			delete_term_meta( $this->term_id, '_salesforce_object_type' );
 		} else {
 			delete_post_meta( $this->post_id, $meta_key );
 			delete_post_meta( $this->post_id, '_salesforce_sync_mode' );
@@ -171,6 +200,8 @@ class Salesforce {
 
 		if ( $this->wc_object && ! empty( $this->wc_object->get_meta( $meta_key, true ) ) ) {
 			return (string) $this->wc_object->get_meta( $meta_key, true );
+		} elseif ( ! empty( $this->term_id ) ) {
+			return (string) get_term_meta( $this->term_id, $meta_key, true );
 		}
 
 		return (string) get_post_meta( $this->post_id, $meta_key, true );
@@ -186,6 +217,8 @@ class Salesforce {
 
 		if ( $this->wc_object && ! empty( $this->wc_object->get_meta( $meta_key, true ) ) ) {
 			return (string) $this->wc_object->get_meta( $meta_key, true );
+		} elseif ( ! empty( $this->term_id ) ) {
+			return (string) get_term_meta( $this->term_id, $meta_key, true );
 		}
 
 		return (string) get_post_meta( $this->post_id, $meta_key, true );
@@ -201,6 +234,8 @@ class Salesforce {
 
 		if ( $this->wc_object && ! empty( $this->wc_object->get_meta( $meta_key, true ) ) ) {
 			return (string) $this->wc_object->get_meta( $meta_key, true );
+		} elseif ( ! empty( $this->term_id ) ) {
+			return (string) get_term_meta( $this->term_id, $meta_key, true );
 		}
 
 		return (string) get_post_meta( $this->post_id, $meta_key, true );
@@ -217,6 +252,8 @@ class Salesforce {
 
 		if ( $this->wc_object && ! empty( $this->wc_object->get_meta( $meta_key, true ) ) ) {
 			return (string) $this->wc_object->get_meta( $meta_key, true );
+		} elseif ( ! empty( $this->term_id ) ) {
+			return (string) get_term_meta( $this->term_id, $meta_key, true );
 		}
 
 		return (string) get_post_meta( $this->post_id, $meta_key, true );
@@ -311,6 +348,56 @@ class Salesforce {
 
 		if ( $query->have_posts() ) {
 			return (int) $query->posts[0];
+		}
+
+		return false;
+	}
+
+	/**
+	 * Finds the term ID associated with a given Salesforce record ID.
+	 *
+	 * @param string $salesforce_record_id The Salesforce record ID to search for.
+	 * @param string|null $taxonomy             Optional. Limit the search to a specific taxonomy.
+	 *                                     Leave empty to search across all taxonomies.
+	 *
+	 * @return int|false The term ID if found, or false if no term matches the given Salesforce record ID.
+	 */
+	public static function find_term_by_salesforce_record_id( string $salesforce_record_id, string|null $taxonomy = '' ): int|false {
+		$salesforce_record_id = sanitize_text_field( $salesforce_record_id );
+
+		$args = array(
+			'meta_query'             => array(
+				'relation' => 'OR',
+				array(
+					'key'     => '_salesforce_object_id',
+					'value'   => $salesforce_record_id,
+					'compare' => '=',
+				),
+				array(
+					'key'     => '_production_salesforce_record_id',
+					'value'   => $salesforce_record_id,
+					'compare' => '=',
+				),
+				array(
+					'key'     => '_sandbox_salesforce_record_id',
+					'value'   => $salesforce_record_id,
+					'compare' => '=',
+				),
+			),
+			'number'                 => 1,
+			'hide_empty'             => false,
+			'fields'                 => 'ids',
+			'update_term_meta_cache' => false,
+		);
+
+		if ( ! empty( $taxonomy ) ) {
+			$args['taxonomy'] = $taxonomy;
+		}
+
+		$query = new \WP_Term_Query( $args );
+
+		if ( ! empty( $query->terms ) ) {
+			return (int) $query->terms[0];
 		}
 
 		return false;
