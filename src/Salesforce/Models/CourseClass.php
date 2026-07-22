@@ -297,4 +297,28 @@ class CourseClass extends ModelsSalesforce {
 
 		return get_post_meta( $post_id, '_additional_class_information', true );
 	}
+
+	/**
+	 * Check if an Events Calendar post or any post represents a Salesforce Class record and has a class ID associated with the post
+	 *
+	 * @param int|string|null|false $post_id Events Calendar event ID/post ID we should check.
+	 *
+	 * @return bool True if this is event represents a Class record. False if this is a plain event.
+	 */
+	public function is_class_event( int|string|null|false $post_id = 0 ): bool {
+		$use_post_id = $post_id;
+		// use the current global post ID to determine if this a class
+		if ( empty( $use_post_id ) ) {
+			$use_post_id = get_the_ID();
+		}
+
+		if ( ! empty( $use_post_id ) ) {
+			$event_post_ids = self::convert_occurrence_to_event( $use_post_id );
+			if ( ! empty( $event_post_ids ) ) {
+				return ! empty( self::get_class_id( $event_post_ids[0] ) );
+			}
+		}
+
+		return false;
+	}
 }

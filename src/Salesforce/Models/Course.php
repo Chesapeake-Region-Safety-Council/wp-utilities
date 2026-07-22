@@ -495,4 +495,29 @@ class Course extends ModelsSalesforce {
 	public function get_spanish_prerequisite_verification_form(): string {
 		return (string) get_post_meta( $this->post_id, '_course_spanish_prerequisite_verification_form', true );
 	}
+
+	/**
+	 * Store the names of the certificate programs that this Course belongs to.
+	 *
+	 * @param array $values Names of the certificate programs that this Course is a part of.
+	 *
+	 * @return void
+	 */
+	public function set_certificate_program_names( array $values ): void {
+		update_post_meta( $this->post_id, '_course_certificate_programs', wp_json_encode( $values ) );
+	}
+
+	/**
+	 * Get the names of the Certificate Programs that this Course belongs to.
+	 *
+	 * @return array|null Names of the certificate programs that the Course belongs to.
+	 */
+	public function get_certificate_program_names(): array|null {
+		$programs = get_post_meta( $this->post_id, '_course_certificate_programs', true );
+		if ( empty( $programs ) ) {
+			return null;
+		}
+
+		return json_decode( $programs, true );
+	}
 }

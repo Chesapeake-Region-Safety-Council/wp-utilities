@@ -131,3 +131,4 @@ phpcs.xml*
 .linear.toml
 .junie
 _temp/
+_salesforce_objects/
