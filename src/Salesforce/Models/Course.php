@@ -37,6 +37,7 @@ class Course extends ModelsSalesforce {
 	public const string FIELD_PUBLISH_COURSE_OSHAMIDATLANTIC         = 'PublishCourseToOSHAMidatlantic__c';
 	public const string FIELD_SYNC_DATE_OSHAMIDATLANTIC              = 'OSHASyncDate__c';
 	public const string FIELD_SYNC_DATE_CHESAPEAKE                   = 'ChesapeakeSyncDate__c';
+	public const string FIELD_CERTIFICATE_PROGRAMS                  = 'CertificatePrograms__r';
 
 	/**
 	 * Get the Salesforce Course ID.
@@ -514,6 +515,31 @@ class Course extends ModelsSalesforce {
 	 */
 	public function get_certificate_program_names(): array|null {
 		$programs = get_post_meta( $this->post_id, '_course_certificate_programs', true );
+		if ( empty( $programs ) ) {
+			return null;
+		}
+
+		return json_decode( $programs, true );
+	}
+
+	/**
+	 * Store the Salesforce IDs of the certificate programs that this Course belongs to.
+	 *
+	 * @param array $values Salesforce IDs of the certificate programs that this Course is a part of.
+	 *
+	 * @return void
+	 */
+	public function set_certificate_programs( array $values ): void {
+		update_post_meta( $this->post_id, '_certificate_programs', wp_json_encode( $values ) );
+	}
+
+	/**
+	 * Get the Salesforce IDs of the Certificate Programs that this Course belongs to.
+	 *
+	 * @return array|null Salesforce IDs of the certificate programs that the Course belongs to.
+	 */
+	public function get_certificate_programs(): array|null {
+		$programs = get_post_meta( $this->post_id, '_certificate_programs', true );
 		if ( empty( $programs ) ) {
 			return null;
 		}
