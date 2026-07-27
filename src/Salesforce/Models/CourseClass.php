@@ -301,6 +301,73 @@ class CourseClass extends ModelsSalesforce {
 	}
 
 	/**
+	 * Set the Class language
+	 *
+	 * @param string|int $post_id
+	 * @param string $value
+	 *
+	 * @return void
+	 */
+	public static function set_class_language( string|int $post_id, string $value ): void {
+		if ( function_exists( '\tribe_events' ) ) {
+			try {
+				tribe_events()->by( 'ID', $post_id )->set( '_class_language', $value )->save();
+				return;
+			} catch ( \Exception $e ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( 'Error updating Salesforce Class Language for ID: ' . $e->getMessage() . ' ' . __METHOD__ );
+			}
+		}
+
+		update_post_meta( $post_id, '_class_language', $value );
+	}
+
+	/**
+	 * Get the class language
+	 *
+	 * @param string|int $post_id
+	 *
+	 * @return mixed
+	 */
+	public static function get_class_language( string|int $post_id ): mixed {
+		if ( function_exists( '\tribe_get_event_meta' ) ) {
+			return tribe_get_event_meta( $post_id, '_class_language', true );
+		}
+
+		return get_post_meta( $post_id, '_class_language', true );
+	}
+
+	/**
+	 * Set the special date information that indicates things like the class only runs on certain days
+	 *
+	 * @param string|int $post_id
+	 * @param string $value
+	 *
+	 * @return void
+	 */
+	public static function set_special_date_information( string|int $post_id, string $value ): void {
+		if ( function_exists( '\tribe_events' ) ) {
+			try {
+				tribe_events()->by( 'ID', $post_id )->set( '_special_date_information', $value )->save();
+				return;
+			} catch ( \Exception $e ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( 'Error updating Salesforce Special Date information for ID: ' . $e->getMessage() . ' ' . __METHOD__ );
+			}
+		}
+
+		update_post_meta( $post_id, '_special_date_information', $value );
+	}
+
+	public static function get_special_date_information( string|int $post_id ): mixed {
+		if ( function_exists( '\tribe_get_event_meta' ) ) {
+			return tribe_get_event_meta( $post_id, '_special_date_information', true );
+		}
+
+		return get_post_meta( $post_id, '_special_date_information', true );
+	}
+
+	/**
 	 * Check if an Events Calendar post or any post represents a Salesforce Class record and has a class ID associated with the post
 	 *
 	 * @param int|string|null|false $post_id Events Calendar event ID/post ID we should check.
@@ -325,79 +392,6 @@ class CourseClass extends ModelsSalesforce {
 		}
 
 		return false;
-	}
-
-	public function set_special_date_information( string|int $post_id, string $value ): void {
-		$use_post_id = $post_id;
-
-		if ( empty( $use_post_id ) && ! empty( $this->post_id ) ) {
-			$use_post_id = $this->post_id;
-		} elseif ( empty( $use_post_id ) ) {
-			// use the current global post ID to determine if this a class
-			$use_post_id = get_the_ID();
-		}
-
-		if ( ! empty( $use_post_id ) ) {
-			update_post_meta( $post_id, '_special_date_information', $value );
-		}
-	}
-
-	public function get_special_date_information( string|int $post_id ): mixed {
-		if ( empty( $use_post_id ) && ! empty( $this->post_id ) ) {
-			$use_post_id = $this->post_id;
-		}
-
-		if ( ! empty( $use_post_id ) ) {
-			$event_post_ids = self::convert_occurrence_to_event( $use_post_id );
-
-			if ( ! empty( $event_post_ids ) ) {
-				return get_post_meta( $event_post_ids[0], '_special_date_information', true );
-			}
-		}
-	}
-
-	/**
-	 * Set the Class language
-	 *
-	 * @param string|int $post_id
-	 * @param string $value
-	 *
-	 * @return void
-	 */
-	public function set_class_language( string|int $post_id, string $value ): void {
-		$use_post_id = $post_id;
-
-		if ( empty( $use_post_id ) && ! empty( $this->post_id ) ) {
-			$use_post_id = $this->post_id;
-		} elseif ( empty( $use_post_id ) ) {
-			// use the current global post ID to determine if this a class
-			$use_post_id = get_the_ID();
-		}
-
-		if ( ! empty( $use_post_id ) ) {
-			update_post_meta( $post_id, '_class_language', $value );
-		}
-	}
-
-	/**
-	 * Get the class language
-	 *
-	 * @param string|int $post_id
-	 *
-	 * @return mixed
-	 */
-	public function get_class_language( string|int $post_id ): mixed {
-		if ( empty( $use_post_id ) && ! empty( $this->post_id ) ) {
-			$use_post_id = $this->post_id;
-		}
-
-		if ( ! empty( $use_post_id ) ) {
-			$event_post_ids = self::convert_occurrence_to_event( $use_post_id );
-
-			if ( ! empty( $event_post_ids ) ) {
-				return get_post_meta( $event_post_ids[0], '_class_language', true );
-			}
-		}
 	}
 
 }
