@@ -44,6 +44,8 @@ class CourseClass extends ModelsSalesforce {
 	public const string FIELD_SYNC_DATE_CHESAPEAKE          = 'ChesapeakeSyncDate__c';
 	public const string FIELD_PUBLISHED                     = 'Published__c';
 	public const string FIELD_CLASS_PASSWORD                = 'ClassPassword__c';
+	public const string FIELD_CLASS_LANGUAGE = 'ClassLanguage__c';
+	public const string FIELD_SPECIAL_DATE_INFORMATION = 'SpecialDateInformation__c';
 	public const string STATUS_PLANNED                      = 'Planned';
 	public const string STATUS_CLOSED                       = 'Closed';
 	public const string STATUS_CANCELLED                    = 'Cancelled';
@@ -324,4 +326,78 @@ class CourseClass extends ModelsSalesforce {
 
 		return false;
 	}
+
+	public function set_special_date_information( string|int $post_id, string $value ): void {
+		$use_post_id = $post_id;
+
+		if ( empty( $use_post_id ) && ! empty( $this->post_id ) ) {
+			$use_post_id = $this->post_id;
+		} elseif ( empty( $use_post_id ) ) {
+			// use the current global post ID to determine if this a class
+			$use_post_id = get_the_ID();
+		}
+
+		if ( ! empty( $use_post_id ) ) {
+			update_post_meta( $post_id, '_special_date_information', $value );
+		}
+	}
+
+	public function get_special_date_information( string|int $post_id ): mixed {
+		if ( empty( $use_post_id ) && ! empty( $this->post_id ) ) {
+			$use_post_id = $this->post_id;
+		}
+
+		if ( ! empty( $use_post_id ) ) {
+			$event_post_ids = self::convert_occurrence_to_event( $use_post_id );
+
+			if ( ! empty( $event_post_ids ) ) {
+				return get_post_meta( $event_post_ids[0], '_special_date_information', true );
+			}
+		}
+	}
+
+	/**
+	 * Set the Class language
+	 *
+	 * @param string|int $post_id
+	 * @param string $value
+	 *
+	 * @return void
+	 */
+	public function set_class_language( string|int $post_id, string $value ): void {
+		$use_post_id = $post_id;
+
+		if ( empty( $use_post_id ) && ! empty( $this->post_id ) ) {
+			$use_post_id = $this->post_id;
+		} elseif ( empty( $use_post_id ) ) {
+			// use the current global post ID to determine if this a class
+			$use_post_id = get_the_ID();
+		}
+
+		if ( ! empty( $use_post_id ) ) {
+			update_post_meta( $post_id, '_class_language', $value );
+		}
+	}
+
+	/**
+	 * Get the class language
+	 *
+	 * @param string|int $post_id
+	 *
+	 * @return mixed
+	 */
+	public function get_class_language( string|int $post_id ): mixed {
+		if ( empty( $use_post_id ) && ! empty( $this->post_id ) ) {
+			$use_post_id = $this->post_id;
+		}
+
+		if ( ! empty( $use_post_id ) ) {
+			$event_post_ids = self::convert_occurrence_to_event( $use_post_id );
+
+			if ( ! empty( $event_post_ids ) ) {
+				return get_post_meta( $event_post_ids[0], '_class_language', true );
+			}
+		}
+	}
+
 }

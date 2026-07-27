@@ -38,6 +38,7 @@ class Course extends ModelsSalesforce {
 	public const string FIELD_SYNC_DATE_OSHAMIDATLANTIC              = 'OSHASyncDate__c';
 	public const string FIELD_SYNC_DATE_CHESAPEAKE                   = 'ChesapeakeSyncDate__c';
 	public const string FIELD_CERTIFICATE_PROGRAMS                  = 'CertificatePrograms__r';
+	public const string FIELD_PREREQUISITE = 'Prerequisite__c';
 
 	/**
 	 * Get the Salesforce Course ID.
@@ -545,5 +546,25 @@ class Course extends ModelsSalesforce {
 		}
 
 		return json_decode( $programs, true );
+	}
+
+	/**
+	 * Store the Course ID of the prerequisite course
+	 *
+	 * @param string The Course ID of the prereq
+	 *
+	 * @return void
+	 */
+	public function set_prerequisite_course_id( string $value ): void {
+		update_post_meta( $this->post_id, '_prerequisite_course_id', $value );
+	}
+
+	/**
+	 * Get the Course ID of the prereq course
+	 *
+	 * @return array|null Course ID of the prereq course
+	 */
+	public function get_prerequisite_course_id(): string|null {
+		return get_post_meta( $this->post_id, '_prerequisite_course_id', true );
 	}
 }
