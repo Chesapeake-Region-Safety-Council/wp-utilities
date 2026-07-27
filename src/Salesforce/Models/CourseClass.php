@@ -394,4 +394,21 @@ class CourseClass extends ModelsSalesforce {
 		return false;
 	}
 
+	/**
+	 * Get the Course post id that is the parent Course of the class
+	 *
+	 * @param int|string|null $post_id The class Post ID to use to search for the Parent Course ID
+	 *
+	 * @return int|null The Post ID of the Course object that is the parent course of the class.
+	 */
+	public static function get_parent_course_post_id( int|string|null $post_id = 0 ): int|null {
+		$course_id = self::get_course_id( $post_id );
+
+		if ( ! empty( $course_id ) ) {
+			return Course::find_by_course_id( $course_id );
+		}
+
+		return null;
+	}
+
 }
