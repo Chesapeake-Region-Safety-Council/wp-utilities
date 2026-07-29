@@ -31,6 +31,7 @@ class CourseClass extends ModelsSalesforce {
 	public const string FIELD_STATUS                        = 'Status__c';
 	public const string FIELD_TYPE                          = 'Type__c';
 	public const string FIELD_IS_VIRTUAL                    = 'IsVirtual__c';
+	public const string FIELD_CLASS_CONTACT_HOURS                      = 'ClassContactHours__c';
 	public const string FIELD_COURSE                        = 'Course__c';
 	public const string FIELD_PARENT_COURSE_ID              = 'ParentCourseID__c';
 	public const string FIELD_STUDENTS_ENROLLED             = 'StudentsEnrolled__c';
@@ -365,6 +366,53 @@ class CourseClass extends ModelsSalesforce {
 		}
 
 		return get_post_meta( $post_id, '_special_date_information', true );
+	}
+
+	/**
+	 * Set the Contact Hours for this class if this class is overriding the Contact Hours of the parent Course.
+	 *
+	 * @param string|int $post_id
+	 * @param string $value
+	 *
+	 * @return void
+	 */
+	public static function set_class_contact_hours( string|int $post_id, string $value ): void {
+		if ( function_exists( '\tribe_events' ) ) {
+			try {
+				tribe_events()->by( 'ID', $post_id )->set( '_class_override_contact_hours', $value )->save();
+				return;
+			} catch ( \Exception $e ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( 'Error updating Salesforce Special Date information for ID: ' . $e->getMessage() . ' ' . __METHOD__ );
+			}
+		}
+
+		update_post_meta( $post_id, '_class_override_contact_hours', $value );
+	}
+
+	public static function get_class_contact_hours( string|int $post_id ): mixed {
+		$parent_course = self::get_parent_course_post_id( $post_id );
+		$course_contact_hours = '';
+		$class_contact_hours = '';
+
+		if ( ! empty( $parent_course ) ) {
+			$course = new Course( $parent_course );
+			$course_contact_hours = $course->get_contact_hours();
+		}
+
+		if ( function_exists( '\tribe_get_event_meta' ) ) {
+			$class_contact_hours = tribe_get_event_meta( $post_id, '_class_override_contact_hours', true );
+		}
+
+		if ( empty( $class_contact_hours ) ) {
+			$class_contact_hours = get_post_meta( $post_id, '_class_override_contact_hours', true );
+		}
+
+		if ( ! empty( $class_contact_hours ) ) {
+			return $class_contact_hours;
+		}
+
+		return $course_contact_hours;
 	}
 
 	/**
