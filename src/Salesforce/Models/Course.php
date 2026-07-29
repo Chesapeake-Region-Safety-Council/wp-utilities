@@ -283,7 +283,7 @@ class Course extends ModelsSalesforce {
 	 *
 	 * @return float
 	 */
-	public function get_contact_hours(): int|float {
+	public function get_contact_hours(): int|float|string {
 		return (float) get_post_meta( $this->post_id, '_course_contact_hours', true );
 	}
 
