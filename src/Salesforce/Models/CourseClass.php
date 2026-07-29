@@ -376,7 +376,7 @@ class CourseClass extends ModelsSalesforce {
 	 *
 	 * @return void
 	 */
-	public static function set_class_contact_hours( string|int $post_id, string $value ): void {
+	public static function set_class_contact_hours( string|int $post_id, string|int|float $value ): void {
 		if ( function_exists( '\tribe_events' ) ) {
 			try {
 				tribe_events()->by( 'ID', $post_id )->set( '_class_override_contact_hours', $value )->save();
