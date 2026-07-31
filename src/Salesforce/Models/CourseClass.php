@@ -459,4 +459,43 @@ class CourseClass extends ModelsSalesforce {
 		return null;
 	}
 
+	/**
+	 * Generates a formatted SKU string for a class based on its course ID and class type attributes.
+	 *
+	 * Constructs a SKU by retrieving the course ID and class ID associated with the given post,
+	 * then appending class type indicators (PUB for public, PVT for private) and delivery method
+	 * (VILT for virtual instructor-led training). The SKU format follows the pattern:
+	 * {COURSE_ID}-{CLASS_TYPE}[-VILT]
+	 *
+	 * @param int|string|null $post_id The WordPress post ID of the class event. Defaults to 0,
+	 *                                 which may resolve to the current post in context.
+	 *
+	 * @return string The formatted class SKU string (e.g., "ABC123-PUB-VILT" or "XYZ789-PVT").
+	 *                Returns an empty string if no course ID is found.
+	 */
+	public static function get_class_sku( int|string|null $post_id = 0 ): string {
+		$course_id = self::get_course_id( $post_id );
+		$class_id = self::get_class_id( $course_id );
+		$course_id_type = '';
+		$is_virtual = 'yes' === get_post_meta( $post_id, '_tribe_events_is_virtual', true );
+		$class_type_append = 'PUB';
+		if ( ! empty( $class_id ) ) {
+			$class_id = strtolower( $class_id );
+
+			if ( str_contains( $class_id, 'pvt' ) ) {
+				$class_type_append = 'PVT';
+			}
+		}
+
+		if ( ! empty( $course_id ) ) {
+			$course_id_type = wp_sprintf( '%s-%s', $course_id, $class_type_append );
+
+			if ( $is_virtual ) {
+				$course_id_type = wp_sprintf( '%s-VILT', $course_id_type );
+			}
+		}
+
+		return $course_id_type;
+	}
+
 }
