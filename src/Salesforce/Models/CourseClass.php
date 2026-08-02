@@ -27,6 +27,7 @@ class CourseClass extends ModelsSalesforce {
 	public const string FIELD_COST                          = 'Cost__c';
 	public const string FIELD_MEMBER_COST                   = 'MemberCost__c';
 	public const string FIELD_MAX_CAPACITY                  = 'MaxCapacity__c';
+	public const string FIELD_REMAINING_CAPACITY             = 'RemainingCapacity__c';
 	public const string FIELD_INSTRUCTOR                    = 'Instructor__c';
 	public const string FIELD_STATUS                        = 'Status__c';
 	public const string FIELD_TYPE                          = 'Type__c';
