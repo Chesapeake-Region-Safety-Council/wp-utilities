@@ -15,7 +15,7 @@ class PriceBookEntries extends ModelsSalesforce {
 	// Field API Names
 	public const string FIELD_PRICEBOOK_ID      = 'Pricebook2Id';
 	public const string FIELD_UNIT_PRICE        = 'UnitPrice';
-	public const string FIELD_IS_ACTIVE          = 'IsActive';
+	public const string FIELD_IS_ACTIVE         = 'IsActive';
 	public const string FIELD_NAME              = 'Name';
 	public const string FIELD_BULK_DISCOUNT_MIN = 'BulkDiscountMinimum__c';
 	public const string FIELD_BULK_DISCOUNT_MAX = 'BulkDiscountMaximum__c';

@@ -37,8 +37,8 @@ class Course extends ModelsSalesforce {
 	public const string FIELD_PUBLISH_COURSE_OSHAMIDATLANTIC         = 'PublishCourseToOSHAMidatlantic__c';
 	public const string FIELD_SYNC_DATE_OSHAMIDATLANTIC              = 'OSHASyncDate__c';
 	public const string FIELD_SYNC_DATE_CHESAPEAKE                   = 'ChesapeakeSyncDate__c';
-	public const string FIELD_CERTIFICATE_PROGRAMS                  = 'CertificatePrograms__r';
-	public const string FIELD_PREREQUISITE = 'Prerequisite__c';
+	public const string FIELD_CERTIFICATE_PROGRAMS                   = 'CertificatePrograms__r';
+	public const string FIELD_PREREQUISITE                           = 'Prerequisite__c';
 
 	/**
 	 * Get the Salesforce Course ID.

@@ -27,17 +27,17 @@ class ClassRegistration extends ModelsSalesforce {
 	public const string FIELD_EXTERNAL_REGISTRATION_ID    = 'ExternalRegistrationID__c';
 	public const string FIELD_EXTERNAL_ORDER_ID           = 'ExternalOrderID__c';
 	public const string FIELD_EXTERNAL_ORDER_URL          = 'ExternalOrderURL__c';
-	public const string FIELD_PAYMENT_STATUS = 'PaymentStatus__c';
-	public const string FIELD_INVOICE_COMPANY_ID = 'InvoiceCompanyID__c';
-	public const string FIELD_INVOICE_NUMBER = 'InvoiceNumber__c';
+	public const string FIELD_PAYMENT_STATUS              = 'PaymentStatus__c';
+	public const string FIELD_INVOICE_COMPANY_ID          = 'InvoiceCompanyID__c';
+	public const string FIELD_INVOICE_NUMBER              = 'InvoiceNumber__c';
 	public const string STATUS_REGISTERED                 = 'Registered';
-	public const string STATUS_CANCELED                  = 'Canceled';
+	public const string STATUS_CANCELED                   = 'Canceled';
 	public const string STATUS_INCOMPLETE                 = 'Incomplete';
 	public const string STATUS_WAITLISTED                 = 'Waitlisted';
 	public const string STATUS_WITHDRAWN                  = 'Withdrawn';
 	public const string PAYMENT_METHOD_CREDIT_CARD        = 'Credit Card';
-	public const string PAYMENT_METHOD_ONLINE_DEBIT_CARD        = 'Online Debit Card';
-	public const string PAYMENT_METHOD_ACH        = 'ACH/eCheck';
+	public const string PAYMENT_METHOD_ONLINE_DEBIT_CARD  = 'Online Debit Card';
+	public const string PAYMENT_METHOD_ACH                = 'ACH/eCheck';
 	public const string PAYMENT_METHOD_INVOICE            = 'Invoice';
 	public const string PAYMENT_METHOD_ONLINE_CREDIT_CARD = 'Online Credit Card';
 	public const string PAYMENT_METHOD_UNPAID             = 'Unpaid';
@@ -45,9 +45,8 @@ class ClassRegistration extends ModelsSalesforce {
 	public const string PAYMENT_METHOD_FREE               = 'Free';
 	public const string PAYMENT_METHOD_PREVIOUSLY_PAID    = 'Previously Paid';
 	public const string PAYMENT_METHOD_REFUNDED           = 'Refunded';
-	public const string PAYMENT_STATUS_PAID = 'Paid';
-	public const string PAYMENT_STATUS_UNPAID = 'Unpaid';
-	public const string PAYMENT_STATUS_REFUNDED = 'Refunded';
-	public const string PAYMENT_STATUS_FREE = 'Free';
-
+	public const string PAYMENT_STATUS_PAID               = 'Paid';
+	public const string PAYMENT_STATUS_UNPAID             = 'Unpaid';
+	public const string PAYMENT_STATUS_REFUNDED           = 'Refunded';
+	public const string PAYMENT_STATUS_FREE               = 'Free';
 }

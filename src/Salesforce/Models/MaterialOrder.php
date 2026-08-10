@@ -98,6 +98,8 @@ class MaterialOrder extends ModelsSalesforce {
 	public const string PAYMENT_METHOD_ONLINE_CREDIT_CARD = 'Online Credit Card';
 	public const string PAYMENT_METHOD_INVOICE            = 'Invoice';
 	public const string PAYMENT_METHOD_COD                = 'COD';
+	public const string PAYMENT_METHOD_ONLINE_DEBIT_CARD  = 'Online Debit Card';
+	public const string PAYMENT_METHOD_ACH                = 'ACH/eCheck';
 
 	/**
 	 * Set the Salesforce material order number (Name).

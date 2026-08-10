@@ -7,7 +7,7 @@ namespace CRSC\WPUtilities\Salesforce\Models;
  * Contact Salesforce Model
  */
 class Contact {
-	public const string OBJECT_NAME = 'Contact';
+	public const string OBJECT_NAME        = 'Contact';
 	public const string FIELD_ACCOUNT_ID   = 'AccountId';
 	public const string FIELD_FIRST_NAME   = 'FirstName';
 	public const string FIELD_MIDDLE_NAME  = 'MiddleName';

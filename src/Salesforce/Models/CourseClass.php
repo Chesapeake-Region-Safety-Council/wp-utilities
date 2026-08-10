@@ -27,12 +27,12 @@ class CourseClass extends ModelsSalesforce {
 	public const string FIELD_COST                          = 'Cost__c';
 	public const string FIELD_MEMBER_COST                   = 'MemberCost__c';
 	public const string FIELD_MAX_CAPACITY                  = 'MaxCapacity__c';
-	public const string FIELD_REMAINING_CAPACITY             = 'RemainingCapacity__c';
+	public const string FIELD_REMAINING_CAPACITY            = 'RemainingCapacity__c';
 	public const string FIELD_INSTRUCTOR                    = 'Instructor__c';
 	public const string FIELD_STATUS                        = 'Status__c';
 	public const string FIELD_TYPE                          = 'Type__c';
 	public const string FIELD_IS_VIRTUAL                    = 'IsVirtual__c';
-	public const string FIELD_CLASS_CONTACT_HOURS                      = 'ClassContactHours__c';
+	public const string FIELD_CLASS_CONTACT_HOURS           = 'ClassContactHours__c';
 	public const string FIELD_COURSE                        = 'Course__c';
 	public const string FIELD_PARENT_COURSE_ID              = 'ParentCourseID__c';
 	public const string FIELD_STUDENTS_ENROLLED             = 'StudentsEnrolled__c';
@@ -46,8 +46,8 @@ class CourseClass extends ModelsSalesforce {
 	public const string FIELD_SYNC_DATE_CHESAPEAKE          = 'ChesapeakeSyncDate__c';
 	public const string FIELD_PUBLISHED                     = 'Published__c';
 	public const string FIELD_CLASS_PASSWORD                = 'ClassPassword__c';
-	public const string FIELD_CLASS_LANGUAGE = 'ClassLanguage__c';
-	public const string FIELD_SPECIAL_DATE_INFORMATION = 'SpecialDateInformation__c';
+	public const string FIELD_CLASS_LANGUAGE                = 'ClassLanguage__c';
+	public const string FIELD_SPECIAL_DATE_INFORMATION      = 'SpecialDateInformation__c';
 	public const string STATUS_PLANNED                      = 'Planned';
 	public const string STATUS_CLOSED                       = 'Closed';
 	public const string STATUS_CANCELLED                    = 'Cancelled';
@@ -392,12 +392,12 @@ class CourseClass extends ModelsSalesforce {
 	}
 
 	public static function get_class_contact_hours( string|int $post_id ): mixed {
-		$parent_course = self::get_parent_course_post_id( $post_id );
+		$parent_course        = self::get_parent_course_post_id( $post_id );
 		$course_contact_hours = '';
-		$class_contact_hours = '';
+		$class_contact_hours  = '';
 
 		if ( ! empty( $parent_course ) ) {
-			$course = new Course( $parent_course );
+			$course               = new Course( $parent_course );
 			$course_contact_hours = $course->get_contact_hours();
 		}
 
@@ -475,10 +475,10 @@ class CourseClass extends ModelsSalesforce {
 	 *                Returns an empty string if no course ID is found.
 	 */
 	public static function get_class_sku( int|string|null $post_id = 0 ): string {
-		$course_id = self::get_course_id( $post_id );
-		$class_id = self::get_class_id( $course_id );
-		$course_id_type = '';
-		$is_virtual = 'yes' === get_post_meta( $post_id, '_tribe_events_is_virtual', true );
+		$course_id         = self::get_course_id( $post_id );
+		$class_id          = self::get_class_id( $course_id );
+		$course_id_type    = '';
+		$is_virtual        = 'yes' === get_post_meta( $post_id, '_tribe_events_is_virtual', true );
 		$class_type_append = 'PUB';
 		if ( ! empty( $class_id ) ) {
 			$class_id = strtolower( $class_id );
@@ -498,5 +498,4 @@ class CourseClass extends ModelsSalesforce {
 
 		return $course_id_type;
 	}
-
 }

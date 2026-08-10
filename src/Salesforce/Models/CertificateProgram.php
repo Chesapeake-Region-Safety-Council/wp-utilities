@@ -11,10 +11,10 @@ use CRSC\WPUtilities\Salesforce\Salesforce as ModelsSalesforce;
 class CertificateProgram extends ModelsSalesforce {
 	public const string OBJECT_NAME = 'CertificateProgram__c';
 	// Field API Names
-	public const string FIELD_CERTIFICATE_PROGRAM_PROVIDER                    = 'CertificateProgramProvider__c';
-	public const string FIELD_DESCRIPTION                                   = 'ProgramDescription__c';
-	public const string FIELD_REQUIREMENTS                            = 'ProgramRequirements__c';
-	public const string FIELD_COMPLETION_MATERIALS                          = 'CompletionMaterial__c';
+	public const string FIELD_CERTIFICATE_PROGRAM_PROVIDER = 'CertificateProgramProvider__c';
+	public const string FIELD_DESCRIPTION                  = 'ProgramDescription__c';
+	public const string FIELD_REQUIREMENTS                 = 'ProgramRequirements__c';
+	public const string FIELD_COMPLETION_MATERIALS         = 'CompletionMaterial__c';
 
 	/**
 	 * Get the completion material.

@@ -11,9 +11,9 @@ use CRSC\WPUtilities\Salesforce\Salesforce as ModelsSalesforce;
 class CertificateProgramCourse extends ModelsSalesforce {
 	public const string OBJECT_NAME = 'CertificateProgramCourseJunction__c';
 	// Field API Names
-	public const string FIELD_CERTIFICATE_PROGRAM                = 'CertificateProgram__c';
-	public const string FIELD_COURSE                                   = 'Course__c';
-	public const string FIELD_TYPE                            = 'CourseType__c';
+	public const string FIELD_CERTIFICATE_PROGRAM = 'CertificateProgram__c';
+	public const string FIELD_COURSE              = 'Course__c';
+	public const string FIELD_TYPE                = 'CourseType__c';
 
 	/**
 	 * Get the completion material.

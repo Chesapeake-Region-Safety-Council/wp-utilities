@@ -11,21 +11,21 @@ use CRSC\WPUtilities\Salesforce\Salesforce as ModelsSalesforce;
 class Campaign extends ModelsSalesforce {
 	public const string OBJECT_NAME = 'Campaign';
 	// Field API Names
-	public const string FIELD_TICKET_PRICE = 'Ticket_Price__c';
-	public const string FIELD_CUSTOMER_PRICE = 'Member_Price__c';
-	public const string FIELD_LOCATION                      = 'Location__c';
-	public const string FIELD_HOST_SITE                     = 'HostSite__c';
-	public const string FIELD_HOST_SITE_ADDRESS             = 'HostSiteAddress__c';
-	public const string FIELD_START_DATE                      = 'StartDate';
-	public const string FIELD_END_DATE                      = 'EndDate';
-	public const string FIELD_START_TIME                    = 'StartTime__c';
-	public const string FIELD_END_TIME                      = 'EndTime__c';
-	public const string FIELD_TYPE                      = 'Type';
-	public const string TYPE_EVENT = 'Event';
-	public const string TYPE_CONFERENCE = 'Conference';
+	public const string FIELD_TICKET_PRICE      = 'Ticket_Price__c';
+	public const string FIELD_CUSTOMER_PRICE    = 'Member_Price__c';
+	public const string FIELD_LOCATION          = 'Location__c';
+	public const string FIELD_HOST_SITE         = 'HostSite__c';
+	public const string FIELD_HOST_SITE_ADDRESS = 'HostSiteAddress__c';
+	public const string FIELD_START_DATE        = 'StartDate';
+	public const string FIELD_END_DATE          = 'EndDate';
+	public const string FIELD_START_TIME        = 'StartTime__c';
+	public const string FIELD_END_TIME          = 'EndTime__c';
+	public const string FIELD_TYPE              = 'Type';
+	public const string TYPE_EVENT              = 'Event';
+	public const string TYPE_CONFERENCE         = 'Conference';
 	public const string TYPE_SEMINAR_CONFERENCE = 'Seminar / Conference';
-	public const string TYPE_ANNUAL_MEETING = 'Annual Meeting';
-	public const string TYPE_WEBINAR = 'Webinar';
+	public const string TYPE_ANNUAL_MEETING     = 'Annual Meeting';
+	public const string TYPE_WEBINAR            = 'Webinar';
 
 	/**
 	 * Resolves a Salesforce record ID to a real WordPress post ID for TEC events.
@@ -131,5 +131,4 @@ class Campaign extends ModelsSalesforce {
 
 		return $occurrence_ids;
 	}
-
 }
