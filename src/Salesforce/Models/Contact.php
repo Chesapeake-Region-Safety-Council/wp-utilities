@@ -7,15 +7,18 @@ namespace CRSC\WPUtilities\Salesforce\Models;
  * Contact Salesforce Model
  */
 class Contact {
-	public const string OBJECT_NAME        = 'Contact';
-	public const string FIELD_ACCOUNT_ID   = 'AccountId';
-	public const string FIELD_FIRST_NAME   = 'FirstName';
-	public const string FIELD_MIDDLE_NAME  = 'MiddleName';
-	public const string FIELD_LAST_NAME    = 'LastName';
-	public const string FIELD_SUFFIX       = 'Suffix';
-	public const string FIELD_EMAIL        = 'Email';
-	public const string FIELD_MOBILE_PHONE = 'MobilePhone';
-	public const string FIELD_WORK_PHONE   = 'npe01__WorkPhone__c';
+	public const string OBJECT_NAME          = 'Contact';
+	public const string FIELD_ACCOUNT_ID     = 'AccountId';
+	public const string FIELD_FIRST_NAME     = 'FirstName';
+	public const string FIELD_MIDDLE_NAME    = 'MiddleName';
+	public const string FIELD_LAST_NAME      = 'LastName';
+	public const string FIELD_SUFFIX         = 'Suffix';
+	public const string FIELD_EMAIL          = 'Email';
+	public const string FIELD_PERSONAL_EMAIL = 'npe01__HomeEmail__c';
+	public const string FIELD_WORK_EMAIL     = 'npe01__WorkEmail__c';
+	public const string FIELD_HOME_PHONE     = 'HomePhone';
+	public const string FIELD_MOBILE_PHONE   = 'MobilePhone';
+	public const string FIELD_WORK_PHONE     = 'npe01__WorkPhone__c';
 	// we are using the mailing address for the billing address
 	public const string FIELD_MAILING_ADDRESS_STREET       = 'MailingStreet';
 	public const string FIELD_MAILING_ADDRESS_CITY         = 'MailingCity';
