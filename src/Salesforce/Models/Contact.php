@@ -7,18 +7,21 @@ namespace CRSC\WPUtilities\Salesforce\Models;
  * Contact Salesforce Model
  */
 class Contact {
-	public const string OBJECT_NAME          = 'Contact';
-	public const string FIELD_ACCOUNT_ID     = 'AccountId';
-	public const string FIELD_FIRST_NAME     = 'FirstName';
-	public const string FIELD_MIDDLE_NAME    = 'MiddleName';
-	public const string FIELD_LAST_NAME      = 'LastName';
-	public const string FIELD_SUFFIX         = 'Suffix';
-	public const string FIELD_EMAIL          = 'Email';
-	public const string FIELD_PERSONAL_EMAIL = 'npe01__HomeEmail__c';
-	public const string FIELD_WORK_EMAIL     = 'npe01__WorkEmail__c';
-	public const string FIELD_HOME_PHONE     = 'HomePhone';
-	public const string FIELD_MOBILE_PHONE   = 'MobilePhone';
-	public const string FIELD_WORK_PHONE     = 'npe01__WorkPhone__c';
+	public const string OBJECT_NAME           = 'Contact';
+	public const string FIELD_ACCOUNT_ID      = 'AccountId';
+	public const string FIELD_FIRST_NAME      = 'FirstName';
+	public const string FIELD_MIDDLE_NAME     = 'MiddleName';
+	public const string FIELD_LAST_NAME       = 'LastName';
+	public const string FIELD_SUFFIX          = 'Suffix';
+	public const string FIELD_EMAIL           = 'Email';
+	public const string FIELD_PERSONAL_EMAIL  = 'npe01__HomeEmail__c';
+	public const string FIELD_WORK_EMAIL      = 'npe01__WorkEmail__c';
+	public const string FIELD_ALTERNATE_EMAIL = 'npe01__AlternateEmail__c';
+	public const string FIELD_HOME_PHONE      = 'HomePhone';
+	public const string FIELD_MOBILE_PHONE    = 'MobilePhone';
+	public const string FIELD_WORK_PHONE      = 'npe01__WorkPhone__c';
+	public const string FIELD_PREFERRED_PHONE = 'npe01__PreferredPhone__c';
+	public const string FIELD_PREFERRED_EMAIL = 'npe01__Preferred_Email__c';
 	// we are using the mailing address for the billing address
 	public const string FIELD_MAILING_ADDRESS_STREET       = 'MailingStreet';
 	public const string FIELD_MAILING_ADDRESS_CITY         = 'MailingCity';
@@ -39,4 +42,10 @@ class Contact {
 	public const string FIELD_MATERIAL_SHIPPING_STATE_CODE   = 'Material_Shipping_Address__StateCode__s';
 	public const string FIELD_MATERIAL_SHIPPING_ZIP          = 'Material_Shipping_Address__PostalCode__s';
 	public const string FIELD_MATERIAL_SHIPPING_COUNTRY_CODE = 'Material_Shipping_Address__CountryCode__s';
+	public const string PREFERRED_PHONE_MOBILE               = 'Mobile';
+	public const string PREFERRED_PHONE_WORK                 = 'Work';
+	public const string PREFERRED_PHONE_HOME                 = 'Home';
+	public const string PREFERRED_EMAIL_PERSONAL             = 'Personal';
+	public const string PREFERRED_EMAIL_WORK                 = 'Work';
+	public const string PREFERRED_EMAIL_ALTERNATE            = 'Home';
 }
