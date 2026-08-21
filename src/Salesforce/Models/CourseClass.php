@@ -26,6 +26,8 @@ class CourseClass extends ModelsSalesforce {
 	public const string FIELD_HOST_SITE_ADDRESS             = 'HostSiteAddress__c';
 	public const string FIELD_COST                          = 'Cost__c';
 	public const string FIELD_MEMBER_COST                   = 'MemberCost__c';
+	public const string FIELD_MEMBER_REGISTRATION_CODES = 'MemberRegistrationCode__c';
+	public const string FIELD_MEMBER_ONLY_CLASS = 'MemberOnlyClass__c';
 	public const string FIELD_MAX_CAPACITY                  = 'MaxCapacity__c';
 	public const string FIELD_REMAINING_CAPACITY            = 'RemainingCapacity__c';
 	public const string FIELD_INSTRUCTOR                    = 'Instructor__c';
@@ -48,7 +50,6 @@ class CourseClass extends ModelsSalesforce {
 	public const string FIELD_CLASS_PASSWORD                = 'ClassPassword__c';
 	public const string FIELD_CLASS_LANGUAGE                = 'ClassLanguage__c';
 	public const string FIELD_SPECIAL_DATE_INFORMATION      = 'SpecialDateInformation__c';
-	public const string FIELD_MEMBER_REGISTRATION_CODES = 'MemberRegistrationCode__c';
 	public const string STATUS_PLANNED                      = 'Planned';
 	public const string STATUS_CLOSED                       = 'Closed';
 	public const string STATUS_CANCELLED                    = 'Cancelled';

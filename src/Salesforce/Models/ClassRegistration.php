@@ -23,6 +23,7 @@ class ClassRegistration extends ModelsSalesforce {
 	public const string FIELD_STATUS                      = 'Status__c';
 	public const string FIELD_COMPANY                     = 'Company__c';
 	public const string FIELD_NSC_MEMBERSHIP_NUMBER       = 'NSCMembershipNumber__c';
+	public const string FIELD_GUEST_NSC_MEMBERSHIP_NUMBER    = 'GuestNSCMembershipNumber__c';
 	public const string FIELD_EXTERNAL_ATTENDEE_ID        = 'ExternalAttendeeID__c';
 	public const string FIELD_EXTERNAL_REGISTRATION_ID    = 'ExternalRegistrationID__c';
 	public const string FIELD_EXTERNAL_ORDER_ID           = 'ExternalOrderID__c';
