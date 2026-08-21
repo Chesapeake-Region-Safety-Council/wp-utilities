@@ -48,6 +48,7 @@ class CourseClass extends ModelsSalesforce {
 	public const string FIELD_CLASS_PASSWORD                = 'ClassPassword__c';
 	public const string FIELD_CLASS_LANGUAGE                = 'ClassLanguage__c';
 	public const string FIELD_SPECIAL_DATE_INFORMATION      = 'SpecialDateInformation__c';
+	public const string FIELD_MEMBER_REGISTRATION_CODES = 'MemberRegistrationCode__c';
 	public const string STATUS_PLANNED                      = 'Planned';
 	public const string STATUS_CLOSED                       = 'Closed';
 	public const string STATUS_CANCELLED                    = 'Cancelled';
