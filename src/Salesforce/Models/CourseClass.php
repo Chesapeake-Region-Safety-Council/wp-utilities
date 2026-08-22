@@ -500,4 +500,34 @@ class CourseClass extends ModelsSalesforce {
 
 		return $course_id_type;
 	}
+
+	/**
+	 * Set i the Class is a members only class.
+	 *
+	 * @param string|int $post_id
+	 * @param bool $members_only_event
+	 *
+	 * @return void
+	 */
+	public static function set_class_members_only( string|int $post_id, bool $members_only_event = false ): void {
+		if ( function_exists( '\tribe_events' ) ) {
+			try {
+				tribe_events()->by( 'ID', $post_id )->set( '_class_members_only', $members_only_event )->save();
+				return;
+			} catch ( \Exception $e ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( 'Error updating Salesforce Members Only event for ID: ' . $e->getMessage() . ' ' . __METHOD__ );
+			}
+		}
+
+		update_post_meta( $post_id, '_class_members_only', $members_only_event );
+	}
+
+	public static function get_class_members_only( string|int $post_id ): bool {
+		if ( function_exists( '\tribe_get_event_meta' ) ) {
+			return boolval( tribe_get_event_meta( $post_id, '_class_members_only', true ) );
+		}
+
+		return boolval( get_post_meta( $post_id, '_class_members_only', true ) );
+	}
 }
