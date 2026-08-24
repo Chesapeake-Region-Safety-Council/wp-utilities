@@ -31,6 +31,7 @@ class ClassRegistration extends ModelsSalesforce {
 	public const string FIELD_PAYMENT_STATUS              = 'PaymentStatus__c';
 	public const string FIELD_INVOICE_COMPANY_ID          = 'InvoiceCompanyID__c';
 	public const string FIELD_INVOICE_NUMBER              = 'InvoiceNumber__c';
+	public const string FIELD_PAYMENT_DATE = 'PaymentDate__c';
 	public const string STATUS_REGISTERED                 = 'Registered';
 	public const string STATUS_CANCELED                   = 'Canceled';
 	public const string STATUS_INCOMPLETE                 = 'Incomplete';
