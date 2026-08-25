@@ -523,7 +523,12 @@ class CourseClass extends ModelsSalesforce {
 		update_post_meta( $post_id, '_class_members_only', $members_only_event );
 	}
 
-	public static function get_class_members_only( string|int $post_id ): bool {
+	/**
+	 * Check if a class is a members only class and can only be registered for by members or the guests.
+	 *
+	 * @return bool True if a members only event, false if not a members only event.
+	 */
+	public static function is_class_members_only( string|int $post_id ): bool {
 		if ( function_exists( '\tribe_get_event_meta' ) ) {
 			return boolval( tribe_get_event_meta( $post_id, '_class_members_only', true ) );
 		}
