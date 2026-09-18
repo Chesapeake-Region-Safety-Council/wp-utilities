@@ -127,6 +127,31 @@ class CourseClass extends ModelsSalesforce {
 	}
 
 	/**
+	 * Get the class ID associated with a given ticket product ID.
+	 *
+	 * @param string|int $ticket_product_id The ticket product ID to look up.
+	 *
+	 * @return string|int|false The class ID if found, false otherwise.
+	 */
+	public static function get_class_id_by_ticket_id( string|int $ticket_product_id ): string|int|false {
+		if ( function_exists( '\tribe_events_get_ticket_event' ) ) {
+			$event = tribe_events_get_ticket_event( $ticket_product_id );
+
+			if ( ! empty( $event ) && $event instanceof \WP_Post ) {
+				return $event->ID;
+			}
+		}
+
+		$event_id = get_post_meta( $ticket_product_id, '_tribe_wooticket_for_event', true );
+
+		if ( ! empty( $event_id ) ) {
+			return (int) $event_id;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Set the Salesforce Class ID attached to the Class post.
 	 * @param string|int $post_id
 	 * @param string $value
