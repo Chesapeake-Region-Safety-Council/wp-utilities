@@ -34,7 +34,8 @@ class CourseClass extends ModelsSalesforce {
 	public const string FIELD_STATUS                        = 'Status__c';
 	public const string FIELD_TYPE                          = 'Type__c';
 	public const string FIELD_IS_VIRTUAL                    = 'IsVirtual__c';
-	public const string FIELD_CLASS_CONTACT_HOURS           = 'ClassContactHours__c';
+	public const string FIELD_CLASS_CONTACT_HOURS           = 'ClassContactHour__c';
+	public const string FIELD_CLASS_CONTINUING_EDUCATION_UNITS = 'ClassContinuingEducationUnit__c';
 	public const string FIELD_COURSE                        = 'Course__c';
 	public const string FIELD_PARENT_COURSE_ID              = 'ParentCourseID__c';
 	public const string FIELD_STUDENTS_ENROLLED             = 'StudentsEnrolled__c';
@@ -559,5 +560,35 @@ class CourseClass extends ModelsSalesforce {
 		}
 
 		return boolval( get_post_meta( $post_id, '_class_members_only', true ) );
+	}
+
+	/**
+	 * Set the host site for the class. Helpful when determining which organization is hosting a VILT class.
+	 *
+	 * @param string|int $post_id
+	 * @param string $value
+	 *
+	 * @return void
+	 */
+	public static function set_host_site( string|int $post_id, string $value ): void {
+		if ( function_exists( '\tribe_events' ) ) {
+			try {
+				tribe_events()->by( 'ID', $post_id )->set( '_host_site', $value )->save();
+				return;
+			} catch ( \Exception $e ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( 'Error updating Salesforce Host Site for ID: ' . $e->getMessage() . ' ' . __METHOD__ );
+			}
+		}
+
+		update_post_meta( $post_id, '_host_site', $value );
+	}
+
+	public static function get_host_site( string|int $post_id ): mixed {
+		if ( function_exists( '\tribe_get_event_meta' ) ) {
+			return tribe_get_event_meta( $post_id, '_host_site', true );
+		}
+
+		return get_post_meta( $post_id, '_host_site', true );
 	}
 }
