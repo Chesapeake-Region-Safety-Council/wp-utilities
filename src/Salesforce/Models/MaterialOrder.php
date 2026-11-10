@@ -81,6 +81,8 @@ class MaterialOrder extends ModelsSalesforce {
 	public const string PAYMENT_STATUS_PAID      = 'Paid';
 	public const string PAYMENT_STATUS_UNPAID    = 'Unpaid';
 	public const string PAYMENT_STATUS_CANCELLED = 'Cancelled';
+	public const string PAYMENT_STATUS_VOIDED      = 'Voided';
+	public const string PAYMENT_STATUS_REFUNDED    = 'Refunded';
 
 	// Fulfillment Status Picklist Values (Field: FulfillmentStatus__c)
 	public const string FULFILLMENT_STATUS_PROCESSING       = 'Processing';

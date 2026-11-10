@@ -54,6 +54,7 @@ class ClassRegistration extends ModelsSalesforce {
 	public const string PAYMENT_STATUS_PAID               = 'Paid';
 	public const string PAYMENT_STATUS_UNPAID             = 'Unpaid';
 	public const string PAYMENT_STATUS_REFUNDED           = 'Refunded';
+	public const string PAYMENT_STATUS_VOIDED      = 'Voided';
 	public const string PAYMENT_STATUS_FREE               = 'Free';
 	public const string PAYMENT_GATEWAY_VALOR = 'Valor';
 	public const string PAYMENT_GATEWAY_AUTHORIZENET = 'Authorize.NET';
