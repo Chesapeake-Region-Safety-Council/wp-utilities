@@ -61,6 +61,10 @@ class MaterialOrder extends ModelsSalesforce {
 	public const string FIELD_INVOICE_COMPANY_ID        = 'InvoiceCompanyID__c';
 	public const string FIELD_TAX_EXEMPT_COMPANY_ID     = 'TaxExemptCompanyID__c';
 	public const string FIELD_TRAINING_CENTER_ID        = 'TrainingCenterID__c';
+	public const string FIELD_PAYMENT_GATEWAY = 'PaymentGateway__c';
+	public const string FIELD_PAYMENT_GATEWAY_TRANSACTION_ID     = 'PaymentGatewayTransactionID__c';
+	public const string FIELD_PAYMENT_RETRIEVAL_REFERENCE_NUMBER     = 'PaymentRetrievalReferenceNumber__c';
+	public const string FIELD_PAYMENT_BATCH_NUMBER     = 'PaymentGatewayBatchNumber__c';
 
 	// Order Status Picklist Values (Field: OrderStatus__c)
 	public const string STATUS_NEW                  = 'New';
@@ -100,6 +104,10 @@ class MaterialOrder extends ModelsSalesforce {
 	public const string PAYMENT_METHOD_COD                = 'COD';
 	public const string PAYMENT_METHOD_ONLINE_DEBIT_CARD  = 'Online Debit Card';
 	public const string PAYMENT_METHOD_ACH                = 'ACH/eCheck';
+
+	// Payment Gateways
+	public const string PAYMENT_GATEWAY_VALOR = 'Valor';
+	public const string PAYMENT_GATEWAY_AUTHORIZENET = 'Authorize.NET';
 
 	/**
 	 * Set the Salesforce material order number (Name).

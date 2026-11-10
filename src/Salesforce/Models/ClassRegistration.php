@@ -32,6 +32,10 @@ class ClassRegistration extends ModelsSalesforce {
 	public const string FIELD_INVOICE_COMPANY_ID          = 'InvoiceCompanyID__c';
 	public const string FIELD_INVOICE_NUMBER              = 'InvoiceNumber__c';
 	public const string FIELD_PAYMENT_DATE                = 'PaymentDate__c';
+	public const string FIELD_PAYMENT_GATEWAY = 'PaymentGateway__c';
+	public const string FIELD_PAYMENT_GATEWAY_TRANSACTION_ID     = 'PaymentGatewayTransactionID__c';
+	public const string FIELD_PAYMENT_RETRIEVAL_REFERENCE_NUMBER     = 'PaymentRetrievalReferenceNumber__c';
+	public const string FIELD_PAYMENT_BATCH_NUMBER     = 'PaymentGatewayBatchNumber__c';
 	public const string STATUS_REGISTERED                 = 'Registered';
 	public const string STATUS_CANCELED                   = 'Canceled';
 	public const string STATUS_INCOMPLETE                 = 'Incomplete';
@@ -51,6 +55,8 @@ class ClassRegistration extends ModelsSalesforce {
 	public const string PAYMENT_STATUS_UNPAID             = 'Unpaid';
 	public const string PAYMENT_STATUS_REFUNDED           = 'Refunded';
 	public const string PAYMENT_STATUS_FREE               = 'Free';
+	public const string PAYMENT_GATEWAY_VALOR = 'Valor';
+	public const string PAYMENT_GATEWAY_AUTHORIZENET = 'Authorize.NET';
 
 	/**
 	 * Get the first name of the attendee from the metadata saved in for the attendee post.
