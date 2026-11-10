@@ -618,4 +618,234 @@ class ClassRegistration extends ModelsSalesforce {
 
 		return null;
 	}
+
+	/**
+	 * Get all the attendees attached to a WooCommerce order.
+	 *
+	 * Calls get_attendee_meta_from_order_item() for every product line item.
+	 *
+	 * @param \WC_Order $order
+	 * @return array[] See get_attendee_meta_from_order_item() for the attendee structure.
+	 */
+	public static function get_attendees_from_order( \WC_Order $order ): array {
+		$attendees = array();
+
+		foreach ( $order->get_items() as $item ) {
+			if ( ! $item instanceof \WC_Order_Item_Product ) {
+				continue;
+			}
+
+			foreach ( self::get_attendee_meta_from_order_item( $order, $item ) as $attendee ) {
+				$attendees[] = $attendee;
+			}
+		}
+
+		return $attendees;
+	}
+
+	/**
+	 * Comprehensive attendee lookup for an order line item.
+	 *
+	 * 1. Attendees attached to the order (tribe_tickets_get_attendees(), then the Tickets Plus WooCommerce provider).
+	 * 2. If both are empty, the attendee meta Event Tickets Plus keeps in a transient before the order is placed.
+	 *
+	 * Each attendee is an array with: attendee_id, product_id, order_item_id, holder_name, holder_email, full_name,
+	 * meta (field slug => value) and source ('order' or 'transient').
+	 *
+	 * @param \WC_Order      $order
+	 * @param \WC_Order_Item $item
+	 * @return array[]
+	 */
+	public static function get_attendee_meta_from_order_item( \WC_Order $order, \WC_Order_Item $item ): array {
+		if ( ! $item instanceof \WC_Order_Item_Product ) {
+			return array();
+		}
+
+		$result = self::get_order_attendees_for_item( $order, $item );
+
+		if ( ! empty( $result ) ) {
+			return $result;
+		}
+
+		foreach ( self::get_attendee_meta_from_transient( $item ) as $attendee_meta ) {
+			if ( ! is_array( $attendee_meta ) ) {
+				continue;
+			}
+
+			$meta = self::normalize_attendee_meta( $attendee_meta );
+
+			$result[] = array(
+				'attendee_id'   => 0,
+				'product_id'    => (int) $item->get_product_id(),
+				'order_item_id' => (int) $item->get_id(),
+				'holder_name'   => '',
+				'holder_email'  => '',
+				'full_name'     => self::resolve_attendee_full_name( $order, $meta, (string) ( $meta['holder_name'] ?? '' ) ),
+				'meta'          => $meta,
+				'source'        => 'transient',
+			);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Get the attendees attached to the order for a line item.
+	 *
+	 * @param \WC_Order              $order
+	 * @param \WC_Order_Item_Product $item
+	 * @return array[]
+	 */
+	public static function get_order_attendees_for_item( \WC_Order $order, \WC_Order_Item_Product $item ): array {
+		$result        = array();
+		$attendees     = array();
+		$order_id      = $order->get_id();
+		$product_id    = $item->get_product_id();
+		$order_item_id = $item->get_id();
+
+		if ( function_exists( '\tribe_tickets_get_attendees' ) ) {
+			$attendees = \tribe_tickets_get_attendees( $order_id );
+		}
+
+		if ( empty( $attendees ) && function_exists( '\tribe' ) && class_exists( '\Tribe__Tickets_Plus__Commerce__WooCommerce__Main' ) ) {
+			$provider = \tribe( 'tickets-plus.commerce.woo' );
+			if ( $provider instanceof \Tribe__Tickets_Plus__Commerce__WooCommerce__Main ) {
+				$attendees = $provider->get_attendees_by_order_id( $order_id );
+			}
+		}
+
+		if ( empty( $attendees ) || ! is_array( $attendees ) ) {
+			return $result;
+		}
+
+		foreach ( $attendees as $attendee ) {
+			$attendee_product_id = $attendee['product_id'] ?? null;
+			$attendee_item_id    = $attendee['order_item_id'] ?? null;
+
+			if ( ! empty( $attendee_item_id ) && (int) $attendee_item_id !== (int) $order_item_id ) {
+				continue;
+			}
+
+			if ( empty( $attendee_item_id ) && (int) $attendee_product_id !== (int) $product_id ) {
+				continue;
+			}
+
+			$attendee_id = (int) ( $attendee['attendee_id'] ?? 0 );
+			$meta        = ! empty( $attendee['attendee_meta'] ) && is_array( $attendee['attendee_meta'] )
+				? self::normalize_attendee_meta( $attendee['attendee_meta'] )
+				: array();
+			$full_name   = $attendee_id ? trim( (string) get_post_meta( $attendee_id, '_tribe_tickets_full_name', true ) ) : '';
+			$holder_name = trim( (string) ( $attendee['holder_name'] ?? '' ) );
+
+			if ( '' === $full_name ) {
+				$full_name = self::resolve_attendee_full_name( $order, $meta, $holder_name );
+			}
+
+			$result[] = array(
+				'attendee_id'   => $attendee_id,
+				'product_id'    => (int) ( $attendee_product_id ?? $product_id ),
+				'order_item_id' => (int) ( $attendee_item_id ?? $order_item_id ),
+				'holder_name'   => $holder_name,
+				'holder_email'  => trim( (string) ( $attendee['holder_email'] ?? '' ) ),
+				'full_name'     => $full_name,
+				'meta'          => $meta,
+				'source'        => 'order',
+			);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Flatten attendee meta ( slug => value or slug => array( 'value' => ... ) ) to slug => value.
+	 *
+	 * @param array $attendee_meta
+	 * @return array
+	 */
+	public static function normalize_attendee_meta( array $attendee_meta ): array {
+		$meta = array();
+
+		foreach ( $attendee_meta as $key => $value ) {
+			if ( is_array( $value ) && array_key_exists( 'value', $value ) ) {
+				$value = $value['value'];
+			}
+
+			$meta[ $key ] = $value;
+		}
+
+		return $meta;
+	}
+
+	/**
+	 * Build the full name of an attendee from its meta, falling back to the holder name and then the billing name.
+	 *
+	 * @param \WC_Order $order
+	 * @param array     $meta        Normalized attendee meta.
+	 * @param string    $holder_name
+	 * @return string
+	 */
+	public static function resolve_attendee_full_name( \WC_Order $order, array $meta, string $holder_name = '' ): string {
+		$parts = array();
+
+		// Fields created in the UI use dashes instead of underscores.
+		foreach ( array( 'first_name', 'middle_name', 'last_name', 'suffix' ) as $key ) {
+			$value = $meta[ $key ] ?? ( $meta[ str_replace( '_', '-', $key ) ] ?? '' );
+
+			if ( is_scalar( $value ) && '' !== trim( (string) $value ) ) {
+				$parts[] = trim( (string) $value );
+			}
+		}
+
+		$name = implode( ' ', $parts );
+
+		if ( '' === $name ) {
+			$name = trim( (string) ( $meta['full_name'] ?? $meta['full-name'] ?? '' ) );
+		}
+
+		if ( '' === $name ) {
+			$name = trim( $holder_name );
+		}
+
+		if ( '' === $name ) {
+			$name = trim( (string) $order->get_formatted_billing_full_name() );
+		}
+
+		return $name;
+	}
+
+	/**
+	 * Retrieves attendee meta stored by Event Tickets Plus in a transient before the order is placed.
+	 *
+	 * Events Tickets plus stores the draft attendee information in a transient instead of being attached to the order.
+	 * The attendee information only gets attached to the order after the order is placed/purchased.
+	 *
+	 * @param \WC_Order_Item $item The order item.
+	 * @return array
+	 */
+	public static function get_attendee_meta_from_transient( \WC_Order_Item $item ): array {
+		if ( ! $item instanceof \WC_Order_Item_Product ) {
+			return array();
+		}
+
+		$item_product_id = $item->get_product_id();
+		$hash            = '';
+
+		if ( class_exists( '\Tribe__Tickets_Plus__Meta__Storage' ) && method_exists( '\Tribe__Tickets_Plus__Meta__Storage', 'get_hash_cookie_key' ) && isset( $_COOKIE[ \Tribe__Tickets_Plus__Meta__Storage::get_hash_cookie_key() ] ) ) {
+			$hash = (string) $_COOKIE[ \Tribe__Tickets_Plus__Meta__Storage::get_hash_cookie_key() ];
+		} elseif ( isset( $_COOKIE['tribe-event-tickets-plus-meta-hash'] ) ) {
+			$hash = (string) $_COOKIE['tribe-event-tickets-plus-meta-hash'];
+		}
+
+		if ( '' === $hash ) {
+			return array();
+		}
+
+		$attendee_meta = get_transient( sprintf( 'tribe_tickets_meta_%s', sanitize_text_field( wp_unslash( $hash ) ) ) );
+
+		if ( ! empty( $attendee_meta ) && is_array( $attendee_meta ) && isset( $attendee_meta[ $item_product_id ] ) && is_array( $attendee_meta[ $item_product_id ] ) ) {
+			return $attendee_meta[ $item_product_id ];
+		}
+
+		return array();
+	}
 }
