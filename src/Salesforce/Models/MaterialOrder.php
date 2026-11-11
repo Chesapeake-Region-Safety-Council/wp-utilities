@@ -65,6 +65,7 @@ class MaterialOrder extends ModelsSalesforce {
 	public const string FIELD_PAYMENT_GATEWAY_TRANSACTION_ID     = 'PaymentGatewayTransactionID__c';
 	public const string FIELD_PAYMENT_RETRIEVAL_REFERENCE_NUMBER     = 'PaymentRetrievalReferenceNumber__c';
 	public const string FIELD_PAYMENT_BATCH_NUMBER     = 'PaymentGatewayBatchNumber__c';
+	public const string FIELD_ACCOUNTING_TRANSACTION_REFERENCE = 'AccountingTransactionReference__c';
 
 	// Order Status Picklist Values (Field: OrderStatus__c)
 	public const string STATUS_NEW                  = 'New';
