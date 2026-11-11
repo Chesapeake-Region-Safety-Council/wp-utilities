@@ -17,6 +17,10 @@ class ClassRegistration extends ModelsSalesforce {
 	// Salesforce record id of the Class__c object.
 	public const string FIELD_CLASS                       = 'Class__c';
 	public const string FIELD_STUDENT                     = 'Student__c';
+	public const string FIELD_STUDENT_FIRST_NAME = 'ClassRegistrationFirstName__c';
+	public const string FIELD_STUDENT_MIDDLE_NAME = 'ClassRegistrationMiddleName__c';
+	public const string FIELD_STUDENT_LAST_NAME = 'ClassRegistrationLastName__c';
+	public const string FIELD_STUDENT_SUFFIX_NAME = 'ClassRegistrationSuffixName__c';
 	public const string FIELD_OTI_APPROVAL                = 'OTIApproval__c';
 	public const string FIELD_PAYMENT_METHOD              = 'PaymentMethod__c';
 	public const string FIELD_REGISTRATION_FEE            = 'RegistrationFee__c';
