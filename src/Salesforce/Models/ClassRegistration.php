@@ -41,6 +41,11 @@ class ClassRegistration extends ModelsSalesforce {
 	public const string FIELD_PAYMENT_RETRIEVAL_REFERENCE_NUMBER     = 'PaymentRetrievalReferenceNumber__c';
 	public const string FIELD_PAYMENT_BATCH_NUMBER     = 'PaymentGatewayBatchNumber__c';
 	public const string FIELD_ACCOUNTING_TRANSACTION_REFERENCE = 'AccountingTransactionReference__c';
+	public const string FIELD_MATERIAL_SHIPPING_STREET       = 'MaterialShippingAddress__Street__s';
+	public const string FIELD_MATERIAL_SHIPPING_CITY         = 'MaterialShippingAddress__City__s';
+	public const string FIELD_MATERIAL_SHIPPING_STATE_CODE   = 'MaterialShippingAddress__StateCode__s';
+	public const string FIELD_MATERIAL_SHIPPING_ZIP          = 'MaterialShippingAddress__PostalCode__s';
+	public const string FIELD_MATERIAL_SHIPPING_COUNTRY_CODE = 'MaterialShippingAddress__CountryCode__s';
 	public const string STATUS_REGISTERED                 = 'Registered';
 	public const string STATUS_CANCELED                   = 'Canceled';
 	public const string STATUS_INCOMPLETE                 = 'Incomplete';
