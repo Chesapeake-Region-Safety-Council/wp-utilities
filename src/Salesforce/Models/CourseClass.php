@@ -600,7 +600,7 @@ class CourseClass extends ModelsSalesforce {
 	 *
 	 * @return void
 	 */
-	public static function set_member_cost( string|int $post_id, string $value ): void {
+	public static function set_member_cost( string|int $post_id, string|int|float $value ): void {
 		if ( function_exists( '\tribe_events' ) ) {
 			try {
 				tribe_events()->by( 'ID', $post_id )->set( '_member_cost', $value )->save();
@@ -652,7 +652,7 @@ class CourseClass extends ModelsSalesforce {
 	 *
 	 * @return void
 	 */
-	public static function set_standard_cost( string|int $post_id, string $value ): void {
+	public static function set_standard_cost( string|int $post_id, string|int|float $value ): void {
 		if ( function_exists( '\tribe_events' ) ) {
 			try {
 				tribe_events()->by( 'ID', $post_id )->set( '_standard_cost', $value )->save();
@@ -673,7 +673,7 @@ class CourseClass extends ModelsSalesforce {
 	 *
 	 * @return mixed
 	 */
-	public static function get_standard_standard( string|int $post_id ): mixed {
+	public static function get_standard_cost( string|int $post_id ): mixed {
 		$cost = 0;
 
 		if ( function_exists( '\tribe_events' ) ) {
