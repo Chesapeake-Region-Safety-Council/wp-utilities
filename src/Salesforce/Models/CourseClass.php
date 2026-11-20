@@ -591,4 +591,108 @@ class CourseClass extends ModelsSalesforce {
 
 		return get_post_meta( $post_id, '_host_site', true );
 	}
+
+	/**
+	 * Store the member cost for the Class.
+	 *
+	 * @param string|int $post_id
+	 * @param string $value
+	 *
+	 * @return void
+	 */
+	public static function set_member_cost( string|int $post_id, string $value ): void {
+		if ( function_exists( '\tribe_events' ) ) {
+			try {
+				tribe_events()->by( 'ID', $post_id )->set( '_member_cost', $value )->save();
+				return;
+			} catch ( \Exception $e ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( 'Error updating Salesforce member price for event for ID: ' . $e->getMessage() . ' ' . __METHOD__ );
+			}
+		}
+
+		update_post_meta( $post_id, '_member_cost', $value );
+	}
+
+	/**
+	 * Get the member cost for the Class and fallback to the Cost of the parent course.
+	 *
+	 * @param string|int $post_id
+	 *
+	 * @return mixed
+	 */
+	public static function get_member_cost( string|int $post_id ): mixed {
+		$cost = 0;
+
+		if ( function_exists( '\tribe_events' ) ) {
+			$cost = tribe_get_event_meta( $post_id, '_member_cost', true );
+		}
+
+		if ( empty( $cost ) && 0 !== (int) $cost ) {
+			$cost = get_post_meta( $post_id, '_member_cost', true );
+		}
+
+		if ( empty( $cost ) && 0 !== (int) $cost ) {
+			$parent_course = self::get_parent_course_post_id( $post_id );
+
+			if ( $parent_course ) {
+				$parent_course = new Course( $parent_course );
+				$cost = $parent_course->get_member_cost();
+			}
+		}
+
+		return $cost;
+	}
+
+	/**
+	 * Store the standard cost for the Class.
+	 *
+	 * @param string|int $post_id
+	 * @param string $value
+	 *
+	 * @return void
+	 */
+	public static function set_standard_cost( string|int $post_id, string $value ): void {
+		if ( function_exists( '\tribe_events' ) ) {
+			try {
+				tribe_events()->by( 'ID', $post_id )->set( '_standard_cost', $value )->save();
+				return;
+			} catch ( \Exception $e ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( 'Error updating Salesforce standard price for event for ID: ' . $e->getMessage() . ' ' . __METHOD__ );
+			}
+		}
+
+		update_post_meta( $post_id, '_standard_cost', $value );
+	}
+
+	/**
+	 * Get the standard cost for the Class and fallback to the parent Course cost for the class.
+	 *
+	 * @param string|int $post_id
+	 *
+	 * @return mixed
+	 */
+	public static function get_standard_standard( string|int $post_id ): mixed {
+		$cost = 0;
+
+		if ( function_exists( '\tribe_events' ) ) {
+			$cost = tribe_get_event_meta( $post_id, '_standard_cost', true );
+		}
+
+		if ( empty( $cost ) && 0 !== (int) $cost ) {
+			$cost = get_post_meta( $post_id, '_standard_cost', true );
+		}
+
+		if ( empty( $cost ) && 0 !== (int) $cost ) {
+			$parent_course = self::get_parent_course_post_id( $post_id );
+
+			if ( $parent_course ) {
+				$parent_course = new Course( $parent_course );
+				$cost = $parent_course->get_cost();
+			}
+		}
+
+		return $cost;
+	}
 }
