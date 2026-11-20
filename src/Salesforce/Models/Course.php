@@ -247,8 +247,14 @@ class Course extends ModelsSalesforce {
 	 *
 	 * @return float
 	 */
-	public function get_cost(): float {
-		return (float) get_post_meta( $this->post_id, '_course_cost', true );
+	public function get_cost(): mixed {
+		$value = get_post_meta( $this->post_id, '_course_cost', true );
+
+		if ( is_numeric( $value ) ) {
+			return (float) $value;
+		}
+
+		return $value;
 	}
 
 	/**
@@ -265,8 +271,14 @@ class Course extends ModelsSalesforce {
 	 *
 	 * @return float
 	 */
-	public function get_member_cost(): float {
-		return (float) get_post_meta( $this->post_id, '_course_member_cost', true );
+	public function get_member_cost(): mixed {
+		$value = get_post_meta( $this->post_id, '_course_member_cost', true );
+
+		if ( is_numeric( $value ) ) {
+			return (float) $value;
+		}
+
+		return $value;
 	}
 
 	/**
