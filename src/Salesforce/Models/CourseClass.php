@@ -297,7 +297,7 @@ class CourseClass extends ModelsSalesforce {
 	public static function update_additional_class_information( string|int $post_id, string $value ): void {
 		if ( function_exists( '\tribe_events' ) ) {
 			try {
-				tribe_events()->by( 'ID', $post_id )->set( '_addtional_class_information', $value )->save();
+				tribe_events()->by( 'ID', $post_id )->set( '_additional_class_information', $value )->save();
 				return;
 			} catch ( \Exception $e ) {
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
@@ -305,7 +305,7 @@ class CourseClass extends ModelsSalesforce {
 			}
 		}
 
-		update_post_meta( $post_id, '_addtional_class_information', $value );
+		update_post_meta( $post_id, '_additional_class_information', $value );
 	}
 
 	/**
